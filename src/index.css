@@ -1,10 +1,11 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 33% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -13,16 +14,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 199 85% 31%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 170 40% 64%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 37 100% 58%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -30,24 +31,17 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 199 85% 31%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -79,14 +73,6 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -96,6 +82,51 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-finance-background text-foreground;
   }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-finance-primary font-medium;
+  }
+}
+
+/* Estilos personalizados para el cuestionario */
+.question-card {
+  @apply bg-white rounded-lg shadow-md p-6 mb-6 border-l-4 border-finance-primary hover:shadow-lg transition-shadow duration-200;
+}
+
+.option-button {
+  @apply w-full text-left p-4 border rounded-md mb-2 flex items-center gap-3 hover:border-finance-accent transition-colors;
+}
+
+.option-button.selected {
+  @apply border-finance-accent bg-finance-secondary/20 font-medium;
+}
+
+.section-title {
+  @apply mb-8 text-2xl font-bold text-center border-b-2 pb-2 border-finance-secondary;
+}
+
+.option-number {
+  @apply flex items-center justify-center h-6 w-6 rounded-full bg-muted text-muted-foreground font-medium text-sm shrink-0;
+}
+
+.section-nav {
+  @apply flex flex-wrap gap-2 mb-6 justify-center;
+}
+
+.section-nav-item {
+  @apply px-3 py-1 rounded-full text-sm border;
+}
+
+.section-nav-item.active {
+  @apply bg-finance-primary text-white border-transparent;
+}
+
+.progress-indicator {
+  @apply h-2 bg-muted rounded-full overflow-hidden mb-6;
+}
+
+.progress-bar {
+  @apply h-full bg-finance-accent transition-all duration-300 ease-in-out;
 }
