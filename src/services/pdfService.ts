@@ -3,7 +3,14 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { QuestionnaireResult } from "../types/questionTypes";
 
-export const generatePDF = async (results: QuestionnaireResult, userInfo: { firstName: string; lastName: string; email: string }) => {
+export const generatePDF = async (
+  results: QuestionnaireResult,
+  userInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  }
+) => {
   try {
     // Get the element to convert to PDF
     const element = document.getElementById("results-container");

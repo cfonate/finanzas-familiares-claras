@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { useQuestionnaire } from "../context/QuestionnaireContext";
 import { Card } from "@/components/ui/card";
@@ -108,7 +109,14 @@ const ResultsDisplay: React.FC = () => {
     }
 
     try {
-      const result = await generatePDF(results, userInfo);
+      // Make sure we're passing a complete UserInfo object with all required fields
+      const userInfoComplete = {
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
+        email: userInfo.email
+      };
+      
+      const result = await generatePDF(results, userInfoComplete);
       
       if (!result.success) {
         throw new Error("Error generating PDF");
