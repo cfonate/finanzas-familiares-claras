@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      form_submissions: {
+        Row: {
+          answers: Json
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          results: Json
+        }
+        Insert: {
+          answers: Json
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          results: Json
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          results?: Json
+        }
+        Relationships: []
+      }
       preguntas: {
         Row: {
           created_at: string
@@ -29,7 +59,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

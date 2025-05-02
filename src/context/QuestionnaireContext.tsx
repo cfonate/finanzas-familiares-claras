@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Section, Answer, QuestionnaireResult } from "../types/questionTypes";
 import { calculateResults } from "../utils/resultsCalculator";
