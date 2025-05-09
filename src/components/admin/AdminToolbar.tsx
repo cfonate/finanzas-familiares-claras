@@ -21,44 +21,50 @@ const AdminToolbar = ({
   onUpdateEmailStatus,
 }: AdminToolbarProps) => {
   return (
-    <div className="flex justify-end mb-4 gap-2 flex-wrap">
-      <Button 
-        variant="outline" 
-        onClick={onRefresh} 
-        disabled={loading}
-        className="flex items-center gap-2"
-      >
-        <RefreshCcw size={18} />
-        Actualizar datos
-      </Button>
-      <Button 
-        onClick={onExportSubmissions}
-        className="flex items-center gap-2 bg-finance-primary hover:bg-finance-primary/80"
-      >
-        <Download size={18} />
-        Exportar envíos
-      </Button>
-      <Button 
-        onClick={onExportEmails}
-        className="flex items-center gap-2 bg-finance-primary hover:bg-finance-primary/80"
-      >
-        <Download size={18} />
-        Exportar cola de emails
-      </Button>
-      <Button 
-        onClick={onExportEmailsForHosting}
-        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
-      >
-        <FileText size={18} />
-        Exportar emails para hosting
-      </Button>
-      <Button 
-        onClick={onUpdateEmailStatus}
-        className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white"
-      >
-        <Send size={18} />
-        Actualizar estado de emails
-      </Button>
+    <div className="flex justify-between items-center mb-6">
+      <div>
+        <Button 
+          variant="outline" 
+          onClick={onRefresh} 
+          disabled={loading}
+          className="flex items-center gap-2"
+        >
+          <RefreshCcw size={16} />
+          Actualizar datos
+        </Button>
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        <Button 
+          onClick={onExportSubmissions}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <Download size={16} />
+          Exportar envíos
+        </Button>
+        <Button 
+          onClick={onExportEmails}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <Download size={16} />
+          Exportar emails
+        </Button>
+        <Button 
+          onClick={onExportEmailsForHosting}
+          className="flex items-center gap-2 bg-finance-primary hover:bg-finance-primary/80"
+        >
+          <FileText size={16} />
+          Preparar emails
+        </Button>
+        <Button 
+          onClick={onUpdateEmailStatus}
+          className="flex items-center gap-2 bg-finance-accent text-black hover:bg-finance-accent/80"
+        >
+          <Send size={16} />
+          Actualizar estado
+        </Button>
+      </div>
     </div>
   );
 };

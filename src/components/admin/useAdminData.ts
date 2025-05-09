@@ -1,10 +1,9 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { useToast } from "@/hooks/use-toast";
+import { Json } from "@/integrations/supabase/types";
 
-export interface Submission {
+interface Submission {
   id: string;
   created_at: string;
   first_name: string;
@@ -16,13 +15,12 @@ export interface Submission {
   };
 }
 
-export interface EmailQueueItem {
+interface EmailQueueItem {
   id: string;
   created_at: string;
   recipient_name: string;
   recipient_email: string;
   subject: string;
-  content: string;
   status: string;
   type: string;
 }
@@ -30,208 +28,173 @@ export interface EmailQueueItem {
 export const useAdminData = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [emailQueue, setEmailQueue] = useState<EmailQueueItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // Obtener los envíos del formulario
-      const { data: formData, error: formError } = await supabase
-        .from("form_submissions")
+      // Fetch submissions
+      const { data: submissionsData, error: submissionsError } = await supabase
+        .from("submissions")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (formError) throw formError;
-      setSubmissions(formData || []);
+      if (submissionsError) throw submissionsError;
 
-      // Obtener la cola de correos electrónicos - using 'any' type to work around the type issue
-      const { data: emailData, error: emailError } = await (supabase as any)
+      // Transform data to match Submission interface
+      const transformedSubmissions: Submission[] = submissionsData.map(item => ({
+        id: item.id,
+        created_at: item.created_at,
+        first_name: item.first_name,
+        last_name: item.last_name,
+        email: item.email,
+        results: item.results as { percentage?: number; category?: string }
+      }));
+
+      setSubmissions(transformedSubmissions);
+
+      // Fetch email queue
+      const { data: emailQueueData, error: emailQueueError } = await supabase
         .from("email_queue")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (emailError) throw emailError;
-      setEmailQueue(emailData || []);
-
+      if (emailQueueError) throw emailQueueError;
+      setEmailQueue(emailQueueData);
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar los datos",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // Formatear fecha actual para nombre del archivo
+  // Helper function to get current date for filename
   const getDateForFilename = () => {
-    return format(new Date(), 'yyyy-MM-dd_HHmm');
+    const now = new Date();
+    return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
   };
 
-  // Exportar datos a CSV
+  // Export data to CSV
   const exportToCSV = (data: any[], filename: string) => {
-    if (data.length === 0) {
-      toast({
-        title: "Sin datos",
-        description: "No hay datos para exportar",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!data.length) return;
 
-    // Convertir datos a CSV
-    const header = Object.keys(data[0]).join(',');
-    const csv = [
-      header,
-      ...data.map(row => Object.values(row).map(value => {
-        // Manejar objetos anidados
-        if (typeof value === 'object' && value !== null) {
-          return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
-        }
-        // Escapar comillas
-        if (typeof value === 'string') {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return `"${value}"`;
+    // Get headers from the first item
+    const headers = Object.keys(data[0]);
+
+    // Create CSV content
+    const csvRows = [
+      headers.join(','), // Header row
+      ...data.map(item => headers.map(header => {
+        const val = item[header];
+        // Handle nested objects
+        const cellVal = typeof val === 'object' && val !== null 
+          ? JSON.stringify(val).replace(/"/g, '""')
+          : val;
+        
+        // Ensure proper CSV escaping
+        return `"${String(cellVal).replace(/"/g, '""')}"`;
       }).join(','))
-    ].join('\n');
+    ];
 
-    // Crear y descargar archivo CSV
-    const blob = new Blob([csv], { type: 'text/csv' });
+    // Create a blob and download the file
+    const csvContent = csvRows.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', filename);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
-  // Función para exportar los correos electrónicos en formato compatible con hosting
+  // Export emails for hosting
   const exportEmailsForHosting = () => {
-    if (emailQueue.length === 0) {
-      toast({
-        title: "Sin datos",
-        description: "No hay correos para exportar",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Filtrar solo los correos pendientes
+    // Filter only pending emails
     const pendingEmails = emailQueue.filter(email => email.status === 'pending');
     
     if (pendingEmails.length === 0) {
-      toast({
-        title: "Sin correos pendientes",
-        description: "Todos los correos ya han sido procesados",
-        variant: "destructive",
-      });
+      alert('No hay emails pendientes para exportar.');
       return;
     }
-
-    // Crear un objeto JSON con los datos necesarios para el envío
-    const emailData = pendingEmails.map(email => ({
+    
+    // Format data for export
+    const exportData = pendingEmails.map(email => ({
       id: email.id,
-      to: email.recipient_email,
-      name: email.recipient_name,
+      recipient_name: email.recipient_name,
+      recipient_email: email.recipient_email,
       subject: email.subject,
-      html: email.content,
       type: email.type
     }));
-
-    // Convertir a JSON y descargar
-    const blob = new Blob([JSON.stringify(emailData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', `emails_for_hosting_${getDateForFilename()}.json`);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    toast({
-      title: "Exportación completada",
-      description: `${pendingEmails.length} correos exportados para su envío`,
-    });
-  };
-
-  // Marcar correos como enviados
-  const markEmailsAsSent = async (ids: string[]) => {
-    try {
-      const { error } = await supabase
-        .from("email_queue")
-        .update({ status: "sent" })
-        .in("id", ids);
-
-      if (error) throw error;
-      
-      toast({
-        title: "Actualización exitosa",
-        description: `${ids.length} correos marcados como enviados`,
-      });
-      
-      fetchData();
-    } catch (error) {
-      console.error("Error updating email status:", error);
-      toast({
-        title: "Error",
-        description: "No se pudieron actualizar los estados de los correos",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Función para actualizar estados de correos según IDs
-  const handleUpdateEmailStatus = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
     
-    input.onchange = async (e) => {
+    // Create JSON file
+    const jsonContent = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `pending_emails_${getDateForFilename()}.json`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handle file input for updating email status
+  const handleUpdateEmailStatus = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'application/json';
+    
+    fileInput.onchange = async (e) => {
       const target = e.target as HTMLInputElement;
-      if (target.files && target.files.length > 0) {
-        const file = target.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = async (event) => {
-          try {
-            if (event.target && event.target.result) {
-              // Convertir el resultado a string antes de parsearlo como JSON
-              const content = typeof event.target.result === 'string' 
-                ? event.target.result 
-                : new TextDecoder().decode(event.target.result as ArrayBuffer);
-                
-              const idsData = JSON.parse(content);
-              if (Array.isArray(idsData) && idsData.length > 0) {
-                await markEmailsAsSent(idsData);
-              } else {
-                toast({
-                  title: "Formato incorrecto",
-                  description: "El archivo debe contener un array de IDs",
-                  variant: "destructive",
-                });
-              }
-            }
-          } catch (error) {
-            toast({
-              title: "Error al procesar el archivo",
-              description: "El archivo no tiene un formato JSON válido",
-              variant: "destructive",
-            });
+      if (!target.files?.length) return;
+      
+      const file = target.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        try {
+          const content = event.target?.result as string;
+          const data = JSON.parse(content);
+          
+          if (!Array.isArray(data) || !data.length || !data[0].id) {
+            alert('Formato de archivo inválido. Se espera un array de objetos con IDs.');
+            return;
           }
-        };
-        
-        reader.readAsText(file);
-      }
+          
+          setLoading(true);
+          
+          // Extract IDs from the uploaded file
+          const emailIds = data.map(item => item.id);
+          
+          // Update status in Supabase
+          const { error } = await supabase
+            .from('email_queue')
+            .update({ status: 'sent' })
+            .in('id', emailIds);
+          
+          if (error) {
+            alert(`Error al actualizar el estado: ${error.message}`);
+          } else {
+            alert(`${emailIds.length} emails marcados como enviados.`);
+            fetchData(); // Refresh data
+          }
+        } catch (error) {
+          console.error('Error processing file:', error);
+          alert('Error al procesar el archivo JSON.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      reader.readAsText(file);
     };
     
-    input.click();
+    fileInput.click();
   };
 
   return {

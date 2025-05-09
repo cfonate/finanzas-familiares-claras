@@ -10,7 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface Submission {
   id: string;
@@ -39,39 +39,67 @@ const SubmissionsTable = ({ submissions, loading }: SubmissionsTableProps) => {
   };
 
   return (
-    <Card className="p-6 mb-8">
-      <h2 className="text-xl font-semibold mb-4">Envíos de Formularios</h2>
-      {loading ? (
-        <p className="text-center py-4">Cargando...</p>
-      ) : submissions.length === 0 ? (
-        <p className="text-center py-4">No hay envíos de formularios</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <Table>
-            <TableCaption>Lista de envíos de formularios</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Puntuación</TableHead>
-                <TableHead>Categoría</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {submissions.map((submission) => (
-                <TableRow key={submission.id}>
-                  <TableCell>{formatDate(submission.created_at)}</TableCell>
-                  <TableCell>{`${submission.first_name} ${submission.last_name}`}</TableCell>
-                  <TableCell>{submission.email}</TableCell>
-                  <TableCell>{submission.results?.percentage || '—'}%</TableCell>
-                  <TableCell>{submission.results?.category || '—'}</TableCell>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle>Envíos de Formularios</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-finance-primary"></div>
+          </div>
+        ) : submissions.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No hay envíos de formularios
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableCaption>Lista de envíos de formularios</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[180px]">Fecha</TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead className="text-right">Puntuación</TableHead>
+                  <TableHead className="text-right">Categoría</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+              </TableHeader>
+              <TableBody>
+                {submissions.map((submission) => (
+                  <TableRow key={submission.id}>
+                    <TableCell className="font-mono text-xs">
+                      {formatDate(submission.created_at)}
+                    </TableCell>
+                    <TableCell>
+                      {`${submission.first_name} ${submission.last_name}`}
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-blue-600">{submission.email}</span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {submission.results?.percentage !== undefined ? (
+                        <span className="font-medium">{submission.results.percentage}%</span>
+                      ) : (
+                        '—'
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {submission.results?.category ? (
+                        <span className="px-2 py-1 bg-finance-secondary/20 rounded-full text-xs">
+                          {submission.results.category}
+                        </span>
+                      ) : (
+                        '—'
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </CardContent>
     </Card>
   );
 };
