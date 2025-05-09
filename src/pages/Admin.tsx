@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -15,7 +14,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download, RefreshCcw } from "lucide-react";
+import { Download, RefreshCcw, FileText, Send } from "lucide-react";
 
 const Admin = () => {
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -117,6 +116,121 @@ const Admin = () => {
     document.body.removeChild(a);
   };
 
+  // Función para exportar los correos electrónicos en formato compatible con hosting
+  const exportEmailsForHosting = () => {
+    if (emailQueue.length === 0) {
+      toast({
+        title: "Sin datos",
+        description: "No hay correos para exportar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Filtrar solo los correos pendientes
+    const pendingEmails = emailQueue.filter(email => email.status === 'pending');
+    
+    if (pendingEmails.length === 0) {
+      toast({
+        title: "Sin correos pendientes",
+        description: "Todos los correos ya han sido procesados",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Crear un objeto JSON con los datos necesarios para el envío
+    const emailData = pendingEmails.map(email => ({
+      id: email.id,
+      to: email.recipient_email,
+      name: email.recipient_name,
+      subject: email.subject,
+      html: email.content,
+      type: email.type
+    }));
+
+    // Convertir a JSON y descargar
+    const blob = new Blob([JSON.stringify(emailData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `emails_for_hosting_${getDateForFilename()}.json`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    toast({
+      title: "Exportación completada",
+      description: `${pendingEmails.length} correos exportados para su envío`,
+    });
+  };
+
+  // Marcar correos como enviados
+  const markEmailsAsSent = async (ids) => {
+    try {
+      const { error } = await supabase
+        .from("email_queue")
+        .update({ status: "sent" })
+        .in("id", ids);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Actualización exitosa",
+        description: `${ids.length} correos marcados como enviados`,
+      });
+      
+      fetchData();
+    } catch (error) {
+      console.error("Error updating email status:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron actualizar los estados de los correos",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Función para actualizar estados de correos según IDs
+  const handleUpdateEmailStatus = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = async (event) => {
+          try {
+            const idsData = JSON.parse(event.target.result);
+            if (Array.isArray(idsData) && idsData.length > 0) {
+              await markEmailsAsSent(idsData);
+            } else {
+              toast({
+                title: "Formato incorrecto",
+                description: "El archivo debe contener un array de IDs",
+                variant: "destructive",
+              });
+            }
+          } catch (error) {
+            toast({
+              title: "Error al procesar el archivo",
+              description: "El archivo no tiene un formato JSON válido",
+              variant: "destructive",
+            });
+          }
+        };
+        
+        reader.readAsText(file);
+      }
+    };
+    
+    input.click();
+  };
+
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), 'dd/MM/yyyy HH:mm:ss');
@@ -185,7 +299,7 @@ const Admin = () => {
         </Card>
       ) : (
         <>
-          <div className="flex justify-end mb-4 gap-2">
+          <div className="flex justify-end mb-4 gap-2 flex-wrap">
             <Button 
               variant="outline" 
               onClick={fetchData} 
@@ -208,6 +322,20 @@ const Admin = () => {
             >
               <Download size={18} />
               Exportar cola de emails
+            </Button>
+            <Button 
+              onClick={exportEmailsForHosting}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              <FileText size={18} />
+              Exportar emails para hosting
+            </Button>
+            <Button 
+              onClick={handleUpdateEmailStatus}
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              <Send size={18} />
+              Actualizar estado de emails
             </Button>
           </div>
 

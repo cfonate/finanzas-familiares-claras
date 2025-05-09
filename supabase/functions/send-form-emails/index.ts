@@ -36,7 +36,7 @@ serve(async (req) => {
       );
     }
 
-    // En lugar de usar Resend, guardamos los datos completos para enviar por su propio hosting
+    // Almacenamos los correos en la cola para que sean procesados por el sistema de hosting del usuario
     const { data, error } = await supabase
       .from("email_queue")
       .insert([
