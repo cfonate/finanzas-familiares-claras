@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -199,21 +200,29 @@ const Admin = () => {
     input.accept = '.json';
     
     input.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (file) {
+      const target = e.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        const file = target.files[0];
         const reader = new FileReader();
         
         reader.onload = async (event) => {
           try {
-            const idsData = JSON.parse(event.target.result);
-            if (Array.isArray(idsData) && idsData.length > 0) {
-              await markEmailsAsSent(idsData);
-            } else {
-              toast({
-                title: "Formato incorrecto",
-                description: "El archivo debe contener un array de IDs",
-                variant: "destructive",
-              });
+            if (event.target && event.target.result) {
+              // Convertir el resultado a string antes de parsearlo como JSON
+              const content = typeof event.target.result === 'string' 
+                ? event.target.result 
+                : new TextDecoder().decode(event.target.result as ArrayBuffer);
+                
+              const idsData = JSON.parse(content);
+              if (Array.isArray(idsData) && idsData.length > 0) {
+                await markEmailsAsSent(idsData);
+              } else {
+                toast({
+                  title: "Formato incorrecto",
+                  description: "El archivo debe contener un array de IDs",
+                  variant: "destructive",
+                });
+              }
             }
           } catch (error) {
             toast({
