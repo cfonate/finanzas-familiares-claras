@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      email_queue: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          recipient_email: string
+          recipient_name: string
+          status: string
+          subject: string
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          recipient_email: string
+          recipient_name: string
+          status?: string
+          subject: string
+          type: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          recipient_email?: string
+          recipient_name?: string
+          status?: string
+          subject?: string
+          type?: string
+        }
+        Relationships: []
+      }
       form_submissions: {
         Row: {
           answers: Json

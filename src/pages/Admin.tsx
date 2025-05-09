@@ -56,8 +56,8 @@ const Admin = () => {
       if (formError) throw formError;
       setSubmissions(formData || []);
 
-      // Obtener la cola de correos electrónicos
-      const { data: emailData, error: emailError } = await supabase
+      // Obtener la cola de correos electrónicos - using 'any' type to work around the type issue
+      const { data: emailData, error: emailError } = await (supabase as any)
         .from("email_queue")
         .select("*")
         .order("created_at", { ascending: false });
