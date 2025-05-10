@@ -35,7 +35,7 @@ export const useAdminData = () => {
     try {
       // Fetch submissions
       const { data: submissionsData, error: submissionsError } = await supabase
-        .from("submissions")
+        .from("form_submissions")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -43,11 +43,11 @@ export const useAdminData = () => {
 
       // Transform data to match Submission interface
       const transformedSubmissions: Submission[] = submissionsData.map(item => ({
-        id: item.id,
+        id: item.id as string,
         created_at: item.created_at,
-        first_name: item.first_name,
-        last_name: item.last_name,
-        email: item.email,
+        first_name: item.first_name as string,
+        last_name: item.last_name as string,
+        email: item.email as string,
         results: item.results as { percentage?: number; category?: string }
       }));
 
@@ -208,3 +208,4 @@ export const useAdminData = () => {
     getDateForFilename
   };
 };
+
