@@ -24,7 +24,8 @@ export const generatePDF = async (
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
-      logging: false
+      logging: false,
+      allowTaint: true // Allow tainted canvas for cross-origin images
     });
     
     // Calculate the PDF dimensions (A4)
@@ -34,30 +35,25 @@ export const generatePDF = async (
     // Create PDF document
     const pdf = new jsPDF("p", "mm", "a4");
     
-    // Add IPFF logo
-    const logoImg = new Image();
-    logoImg.src = "https://ipff.es/wp-content/uploads/2025/04/Logo_home.svg";
-    pdf.addImage(logoImg, "SVG", 10, 10, 50, 20);
-    
-    // Add title and user info
+    // Add title and user info first (don't try to add logo which might fail)
     pdf.setFontSize(18);
     pdf.setTextColor(46, 80, 144); // #2E5090
-    pdf.text("Resultados de Evaluación Financiera", 10, 40);
+    pdf.text("Resultados de Evaluación Financiera", 10, 20);
     
     pdf.setFontSize(12);
     pdf.setTextColor(0);
-    pdf.text(`Nombre: ${userInfo.firstName} ${userInfo.lastName}`, 10, 50);
-    pdf.text(`Email: ${userInfo.email}`, 10, 57);
-    pdf.text(`Fecha: ${new Date().toLocaleDateString()}`, 10, 64);
+    pdf.text(`Nombre: ${userInfo.firstName} ${userInfo.lastName}`, 10, 30);
+    pdf.text(`Email: ${userInfo.email}`, 10, 37);
+    pdf.text(`Fecha: ${new Date().toLocaleDateString()}`, 10, 44);
     
     // Add results image
     pdf.addImage(
       canvas.toDataURL("image/png"), 
       "PNG", 
       10, 
-      70, 
+      50, 
       imgWidth - 20, 
-      imgHeight * 0.8
+      imgHeight * 0.7
     );
     
     // Save the PDF
