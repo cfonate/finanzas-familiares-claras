@@ -143,7 +143,6 @@ export const questionnaireSections: Section[] = [
           { label: "d) Sí, más de 500 € mensuales", value: "d", points: 4 },
         ],
       },
-      // Continuar con el resto de preguntas de esta sección...
       {
         id: 14,
         text: "¿Qué ingresos aproximados provienen de trabajo autónomo o negocio propio?",
@@ -412,7 +411,7 @@ export const questionnaireSections: Section[] = [
           { label: "a) No tenemos deudas", value: "a", points: 4 },
           { label: "b) Pagamos según urgencia o disponibilidad", value: "b", points: 2 },
           { label: "c) Pagamos primero las más caras (interés alto)", value: "c", points: 3 },
-          { label: "d) Pagamos primero las más pequeñas (método bola de nieve)", value: "d", points: 3 },
+          { label: "d) Pagamos primero las más pequeñas (método bola de nieve)", value: "c", points: 3 },
         ],
       },
       {
@@ -468,7 +467,7 @@ export const questionnaireSections: Section[] = [
         options: [
           { label: "a) Nada", value: "a", points: 1 },
           { label: "b) Menos de 20 €", value: "b", points: 2 },
-          { label: "c) Entre 20 € y 50 €", value: "b", points: 3 },
+          { label: "c) Entre 20 € y 50 €", value: "c", points: 3 },
           { label: "d) Más de 50 €", value: "d", points: 4 },
         ],
       },
@@ -609,4 +608,4 @@ export const questionnaireSections: Section[] = [
           { label: "a) No", value: "a", points: 1 },
           { label: "b) Sí, con aportes esporádicos", value: "b", points: 2 },
           { label: "c) Sí, con aportes periódicos", value: "c", points: 3 },
-          { label:
+          { label: "d) Sí, con aportes elevados y planificación", value:
