@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { useQuestionnaire } from "../context/QuestionnaireContext";
 import { Card } from "@/components/ui/card";
@@ -13,8 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 import UserInfoForm, { UserInfo } from "./UserInfoForm";
 import { saveSubmission, sendEmails } from "../services/submissionService";
-import { generatePDF } from "../services/pdfService";
 import { toast } from "@/hooks/use-toast";
+
+const GREEN = "#0EDE85"; // Verde solicitado
 
 const ResultsDisplay: React.FC = () => {
   const { results, sections, answers } = useQuestionnaire();
@@ -26,34 +28,25 @@ const ResultsDisplay: React.FC = () => {
     return <div>Cargando resultados...</div>;
   }
 
+  // ICONOS EN VERDE
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "Excelente":
-        return <CircleCheck className="w-12 h-12 text-finance-success" />;
+        return <CircleCheck className="w-12 h-12" color={GREEN} />;
       case "Buena":
-        return <CircleMinus className="w-12 h-12 text-finance-warning" />;
+        return <CircleMinus className="w-12 h-12" color={GREEN} />;
       case "Regular":
-        return <CircleHelp className="w-12 h-12 text-finance-warning" />;
+        return <CircleHelp className="w-12 h-12" color={GREEN} />;
       case "Deficiente":
-        return <CircleX className="w-12 h-12 text-finance-danger" />;
+        return <CircleX className="w-12 h-12" color={GREEN} />;
       default:
-        return <CircleHelp className="w-12 h-12" />;
+        return <CircleHelp className="w-12 h-12" color={GREEN} />;
     }
   };
 
+  // CLASES DE CATEGORÍA EN VERDE
   const getCategoryClass = (category: string) => {
-    switch (category) {
-      case "Excelente":
-        return "bg-green-100 text-green-800 border-green-300";
-      case "Buena":
-        return "bg-blue-100 text-blue-800 border-blue-300";
-      case "Regular":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      case "Deficiente":
-        return "bg-red-100 text-red-800 border-red-300";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
-    }
+    return "bg-white text-[#0EDE85] border-[#0EDE85]";
   };
 
   const handleUserInfoSubmit = async (data: UserInfo) => {
@@ -112,7 +105,7 @@ const ResultsDisplay: React.FC = () => {
       ) : (
         <div id="results-container" ref={resultsContainerRef}>
           <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold mb-6 text-finance-primary">
+            <h2 className="text-3xl font-bold mb-6" style={{ color: GREEN }}>
               Resultados de su Evaluación Financiera
             </h2>
             <div className="flex justify-center items-center mb-6">
@@ -120,6 +113,11 @@ const ResultsDisplay: React.FC = () => {
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-lg font-medium ${getCategoryClass(
                   results.category
                 )}`}
+                style={{
+                  background: "#e6fff4",
+                  color: GREEN,
+                  border: `2px solid ${GREEN}`,
+                }}
               >
                 {getCategoryIcon(results.category)}
                 <span>Situación financiera: {results.category}</span>
@@ -129,15 +127,21 @@ const ResultsDisplay: React.FC = () => {
             <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-6 border">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-lg font-medium text-gray-700">Puntuación total:</span>
-                <span className="text-2xl font-bold text-finance-primary">
+                <span className="text-2xl font-bold" style={{ color: GREEN }}>
                   {results.percentage}%
                 </span>
               </div>
               
               <div className="w-full bg-gray-200 rounded-full h-4 mb-6">
                 <div
-                  className="bg-finance-primary h-4 rounded-full"
-                  style={{ width: `${results.percentage}%` }}
+                  className=""
+                  style={{
+                    background: GREEN,
+                    height: "1rem",
+                    borderRadius: "9999px",
+                    width: `${results.percentage}%`,
+                    transition: "width 0.3s"
+                  }}
                 ></div>
               </div>
               
@@ -148,8 +152,8 @@ const ResultsDisplay: React.FC = () => {
           </div>
 
           <Card className="p-6">
-            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <BarChart className="text-finance-accent" />
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2" style={{ color: GREEN }}>
+              <BarChart style={{ color: GREEN }} />
               Resultados por sección
             </h3>
             
@@ -163,14 +167,20 @@ const ResultsDisplay: React.FC = () => {
                     className="border rounded-md p-4 hover:bg-gray-50"
                   >
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">Sección {score.sectionId}: {section?.title}</span>
-                      <span className="text-finance-primary font-semibold">{score.percentage}%</span>
+                      <span className="font-medium" style={{ color: GREEN }}>
+                        Sección {score.sectionId}: {section?.title}
+                      </span>
+                      <span className="font-semibold" style={{ color: GREEN }}>{score.percentage}%</span>
                     </div>
                     
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-finance-accent h-2 rounded-full"
-                        style={{ width: `${score.percentage}%` }}
+                        style={{
+                          background: GREEN,
+                          height: "0.5rem",
+                          borderRadius: "9999px",
+                          width: `${score.percentage}%`
+                        }}
                       ></div>
                     </div>
                     
@@ -184,7 +194,9 @@ const ResultsDisplay: React.FC = () => {
           </Card>
 
           <Card className="p-6 mt-6">
-            <h3 className="text-xl font-semibold mb-4">Recomendaciones Personalizadas</h3>
+            <h3 className="text-xl font-semibold mb-4" style={{ color: GREEN }}>
+              Recomendaciones Personalizadas
+            </h3>
             <ul className="list-disc pl-5 space-y-2">
               {results.recommendations.map((recommendation, index) => (
                 <li key={index} className="text-gray-700">
@@ -194,17 +206,16 @@ const ResultsDisplay: React.FC = () => {
             </ul>
           </Card>
 
-          {/* Botones solo para recargar/cuestionario nuevo, NO PDF */}
           <div className="flex justify-center mt-8">
             <Button
               onClick={() => window.location.reload()}
-              className="bg-finance-primary hover:bg-finance-primary/80"
+              className="bg-[#0EDE85] hover:bg-[#0ECD6C] text-white font-bold"
             >
               Completar nuevo cuestionario
             </Button>
           </div>
 
-          <div className="text-center text-finance-primary mt-8 font-semibold">
+          <div className="text-center mt-8 font-semibold" style={{ color: GREEN }}>
             El informe será revisado y enviado al administrador tras completar el formulario.
           </div>
         </div>
