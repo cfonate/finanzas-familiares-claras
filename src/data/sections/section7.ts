@@ -8,7 +8,7 @@ export const section7: Section = {
   questions: [
     {
       id: 111,
-      text: "¿Tienen un plan financiero familiar a largo plazo?",
+      text: "¿Tenéis un plan financiero familiar a largo plazo?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
