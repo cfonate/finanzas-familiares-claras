@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { useQuestionnaire } from "../context/QuestionnaireContext";
 import { Card } from "@/components/ui/card";
@@ -95,44 +94,6 @@ const ResultsDisplay: React.FC = () => {
       });
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleDownloadPDF = async () => {
-    if (!userInfo) {
-      toast({
-        title: "Información requerida",
-        description: "Por favor complete el formulario antes de descargar el PDF",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      // Make sure we're passing a complete UserInfo object with all required fields
-      const userInfoComplete = {
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        email: userInfo.email
-      };
-      
-      const result = await generatePDF(results, userInfoComplete);
-      
-      if (!result.success) {
-        throw new Error("Error generating PDF");
-      }
-      
-      toast({
-        title: "PDF generado",
-        description: "Su PDF ha sido descargado correctamente",
-      });
-    } catch (error) {
-      console.error("Error downloading PDF:", error);
-      toast({
-        title: "Error",
-        description: "Hubo un problema al generar el PDF",
-        variant: "destructive",
-      });
     }
   };
 
@@ -233,30 +194,18 @@ const ResultsDisplay: React.FC = () => {
             </ul>
           </Card>
 
-          <div className="flex flex-col md:flex-row justify-center mt-8 space-y-4 md:space-y-0 md:space-x-4">
-            <Button 
-              variant="outline" 
-              onClick={window.print}
-              className="border-finance-primary text-finance-primary hover:bg-finance-primary/10 flex items-center gap-2"
-            >
-              <Save size={18} />
-              Imprimir resultados
-            </Button>
-            
-            <Button
-              onClick={handleDownloadPDF}
-              className="bg-finance-primary hover:bg-finance-primary/80 flex items-center gap-2"
-            >
-              <Mail size={18} />
-              Descargar como PDF
-            </Button>
-            
+          {/* Botones solo para recargar/cuestionario nuevo, NO PDF */}
+          <div className="flex justify-center mt-8">
             <Button
               onClick={() => window.location.reload()}
               className="bg-finance-primary hover:bg-finance-primary/80"
             >
               Completar nuevo cuestionario
             </Button>
+          </div>
+
+          <div className="text-center text-finance-primary mt-8 font-semibold">
+            El informe será revisado y enviado al administrador tras completar el formulario.
           </div>
         </div>
       )}
