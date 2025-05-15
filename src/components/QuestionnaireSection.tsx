@@ -48,16 +48,17 @@ const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
 
   return (
     <div className="mb-10">
-      <h2 className="section-title">
-        SECCIÓN {section.id}: {section.title}
-      </h2>
-      
-      {section.description && (
-        <p className="text-center text-muted-foreground mb-8">
-          {section.description}
-        </p>
-      )}
-
+      {/* Sticky para el título de la sección */}
+      <div className="sticky top-[92px] z-10 bg-finance-background pb-2">
+        <h2 className="section-title mb-0">
+          SECCIÓN {section.id}: {section.title}
+        </h2>
+        {section.description && (
+          <p className="text-center text-muted-foreground mb-4">
+            {section.description}
+          </p>
+        )}
+      </div>
       <div className="space-y-8">
         {section.questions.map((question) => (
           <Question
@@ -78,7 +79,7 @@ const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
           <ChevronLeft size={16} />
           Sección anterior
         </Button>
-        
+
         <Button
           onClick={navigateToNextSection}
           disabled={!allQuestionsAnswered}
@@ -88,7 +89,7 @@ const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
           {!isLastSection && <ChevronRight size={16} />}
         </Button>
       </div>
-      
+
       {!allQuestionsAnswered && (
         <p className="text-sm text-finance-danger mt-2 text-center">
           Por favor responde todas las preguntas para continuar
