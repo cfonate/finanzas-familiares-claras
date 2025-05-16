@@ -8,7 +8,7 @@ export const section3: Section = {
   questions: [
     {
       id: 26,
-      text: "¿Llevan algún control de sus gastos mensuales?",
+      text: "¿Lleváis algún control de sus gastos mensuales?",
       options: [
         { label: "a) Sí, detallado en una hoja de cálculo o app", value: "a", points: 4 },
         { label: "b) Sí, pero solo con anotaciones generales", value: "b", points: 3 },
