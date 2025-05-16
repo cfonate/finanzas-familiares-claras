@@ -5,12 +5,15 @@ import Question from "./Question";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+// Recibe la prop de sticky
 interface QuestionnaireSectionProps {
   sectionIndex: number;
+  isStickyLogoVisible?: boolean;
 }
 
 const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
   sectionIndex,
+  isStickyLogoVisible = false,
 }) => {
   const {
     sections,
@@ -46,10 +49,13 @@ const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
     )
   );
 
+  // Añadimos un padding-top extra solo cuando el sticky logo es visible
+  const headerPaddingTop = isStickyLogoVisible ? "pt-20" : "";
+
   return (
     <div className="mb-10">
       {/* Sticky para el título de la sección */}
-      <div className="sticky top-[92px] z-10 bg-finance-background pb-2">
+      <div className={`sticky top-[92px] z-10 bg-finance-background pb-2 transition-all duration-300 ${headerPaddingTop}`}>
         <h2 className="section-title mb-0">
           SECCIÓN {section.id}: {section.title}
         </h2>
