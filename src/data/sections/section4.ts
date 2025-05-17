@@ -18,7 +18,7 @@ export const section4: Section = {
     },
     {
       id: 52,
-      text: "¿Con qué frecuencia ahorran dinero?",
+      text: "¿Con qué frecuencia ahorrais?",
       options: [
         { label: "a) Nunca", value: "a", points: 1 },
         { label: "b) Solo si sobra algo", value: "b", points: 2 },
@@ -28,7 +28,7 @@ export const section4: Section = {
     },
     {
       id: 53,
-      text: "¿Cuánto ahorran aproximadamente cada mes?",
+      text: "¿Cuánto ahorrais aproximadamente cada mes?",
       options: [
         { label: "a) Nada", value: "a", points: 1 },
         { label: "b) Hasta 100 €", value: "b", points: 2 },
