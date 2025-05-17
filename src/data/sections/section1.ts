@@ -44,7 +44,7 @@ export const section1: Section = {
         { label: "b) La mujer", value: "b", points: 2 },
         { label: "c) Ambos por igual", value: "c", points: 4 },
         { label: "d) Otro familiar", value: "d", points: 1 },
-        { label: "e) nadie", value: "e", points: 1 },
+        { label: "e) Nadie", value: "e", points: 1 },
       ],
     },
     {
@@ -69,7 +69,7 @@ export const section1: Section = {
     },
     {
       id: 7,
-      text: "¿Cuál es el nivel de estudios más alto alcanzado por quien gestiona el dinero familiar?",
+      text: "¿Cuál es el nivel de estudios más alto alcanzado por quien gestiona la economía familiar?",
       options: [
         { label: "a) Educación primaria", value: "a", points: 1 },
         { label: "b) Educación secundaria", value: "b", points: 2 },
@@ -80,7 +80,7 @@ export const section1: Section = {
     },
     {
       id: 8,
-      text: "¿Trabajáis ambos miembros de la pareja actualmente?",
+      text: "¿Trabajáis ambos miembros actualmente?",
       options: [
         { label: "a) Sí, ambos a jornada completa", value: "a", points: 4 },
         { label: "b) Uno a jornada completa, otro parcial", value: "b", points: 3 },
