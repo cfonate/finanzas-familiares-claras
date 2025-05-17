@@ -49,7 +49,7 @@ const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
   );
 
   // Ajusta el padding-top cuando el logo sticky está visible (más alto para evitar que tape el título)
-  const headerPaddingTop = isStickyLogoVisible ? "pt-28" : "pt-0";
+  const headerPaddingTop = isStickyLogoVisible ? "pt-[124px]" : "pt-4";
 
   return (
     <div className="mb-10">
@@ -94,7 +94,6 @@ const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
           {!isLastSection && <ChevronRight size={16} />}
         </Button>
       </div>
-
       {!allQuestionsAnswered && (
         <p className="text-sm text-finance-danger mt-2 text-center">
           Por favor responde todas las preguntas para continuar
