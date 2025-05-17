@@ -119,12 +119,12 @@ export const section2: Section = {
     },
     {
       id: 22,
-      text: "¿Tenés ingresos extra en ciertas épocas (bonos, pagas extras, etc.)?",
+      text: "¿Tenéis ingresos extra en ciertas épocas (bonos, pagas extras, etc.)?",
       options: [
         { label: "a) No", value: "a", points: 1 },
-        { label: "b) Una vez al año (hasta 1.500 €)", value: "b", points: 2 },
-        { label: "c) Dos veces al año (hasta 3.000 €)", value: "c", points: 3 },
-        { label: "d) Con frecuencia (más de 3.000 € anuales)", value: "d", points: 4 },
+        { label: "b) Una vez al año o hasta 1.500 €", value: "b", points: 2 },
+        { label: "c) Dos veces al año o hasta 3.000 €", value: "c", points: 3 },
+        { label: "d) Con frecuencia o más de 3.000 € anuales", value: "d", points: 4 },
       ],
     },
     {
