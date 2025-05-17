@@ -158,7 +158,7 @@ export const section8: Section = {
     },
     {
       id: 146,
-      text: "¿Estáis interesados en aumentar sus ingresos mediante formación o educación continua (cursos, estudios, etc.)?",
+      text: "¿Estáis interesados en aumentar vuestros ingresos mediante formación o educación continua (cursos, estudios, etc.)?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no de forma inmediata", value: "b", points: 2 },
