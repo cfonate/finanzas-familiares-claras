@@ -1,4 +1,4 @@
-
+n´
 import { Section } from "../../types/questionTypes";
 
 export const section5: Section = {
@@ -8,7 +8,7 @@ export const section5: Section = {
   questions: [
     {
       id: 71,
-      text: "¿Tienen actualmente alguna deuda activa?",
+      text: "¿Tenéis alguna deuda activa?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, solo una (crédito personal o tarjeta)", value: "b", points: 3 },
@@ -18,7 +18,7 @@ export const section5: Section = {
     },
     {
       id: 72,
-      text: "¿Cuánto deben aproximadamente (excluyendo hipoteca)?",
+      text: "¿Cuánto debéis aproximadamente (excluyendo hipoteca)?",
       options: [
         { label: "a) Nada", value: "a", points: 4 },
         { label: "b) Menos de 2.000 €", value: "b", points: 3 },
@@ -28,7 +28,7 @@ export const section5: Section = {
     },
     {
       id: 73,
-      text: "¿Qué tipo de deuda es la más relevante actualmente?",
+      text: "¿Qué tipo de deuda es la más relevante actualmente (excluyendo hipoteca)?",
       options: [
         { label: "a) Crédito al consumo o personal", value: "a", points: 2 },
         { label: "b) Tarjeta de crédito", value: "b", points: 1 },
@@ -38,7 +38,7 @@ export const section5: Section = {
     },
     {
       id: 74,
-      text: "¿Cuánto pagan al mes en cuotas de deuda (excluyendo hipoteca)?",
+      text: "¿Cuánto pagáis al mes en cuotas de deuda (excluyendo hipoteca)?",
       options: [
         { label: "a) Nada", value: "a", points: 4 },
         { label: "b) Menos de 100 €", value: "b", points: 3 },
@@ -48,7 +48,7 @@ export const section5: Section = {
     },
     {
       id: 75,
-      text: "¿Cuánto pagan al mes por la hipoteca, si tienen?",
+      text: "¿Cuánto pagáis al mes por la hipoteca, si tenéis?",
       options: [
         { label: "a) No tenemos hipoteca", value: "a", points: 4 },
         { label: "b) Menos de 400 €", value: "b", points: 3 },
@@ -58,7 +58,7 @@ export const section5: Section = {
     },
     {
       id: 76,
-      text: "¿Alguna vez se han retrasado en el pago de una cuota de deuda?",
+      text: "¿Alguna vez os habéis retrasado en el pago de una cuota de deuda?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, 1 o 2 veces puntuales", value: "b", points: 3 },
@@ -68,7 +68,7 @@ export const section5: Section = {
     },
     {
       id: 77,
-      text: "¿Qué porcentaje de sus ingresos netos se destinan al pago de deudas (incluyendo hipoteca)?",
+      text: "¿Qué porcentaje de vuestros ingresos netos se destinan al pago de deudas (incluyendo hipoteca)?",
       options: [
         { label: "a) Menos del 10 %", value: "a", points: 4 },
         { label: "b) Entre el 10 % y el 25 %", value: "b", points: 3 },
@@ -78,7 +78,7 @@ export const section5: Section = {
     },
     {
       id: 78,
-      text: "¿Utilizan tarjetas de crédito habitualmente para los gastos mensuales?",
+      text: "¿Utilizáis tarjetas de crédito habitualmente para los gastos mensuales?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, pero las pagamos en su totalidad cada mes", value: "b", points: 3 },
@@ -88,7 +88,7 @@ export const section5: Section = {
     },
     {
       id: 79,
-      text: "¿Tienen préstamos vigentes con entidades financieras (bancos, financieras, etc.)?",
+      text: "¿Tenéis préstamos vigentes con entidades financieras (bancos, financieras, etc.)?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, uno", value: "b", points: 3 },
@@ -98,7 +98,7 @@ export const section5: Section = {
     },
     {
       id: 80,
-      text: "¿Piden préstamos para gastos puntuales como vacaciones, tecnología, etc.?",
+      text: "¿Pedís préstamos para gastos puntuales como vacaciones, tecnología, etc.?",
       options: [
         { label: "a) Nunca", value: "a", points: 4 },
         { label: "b) Muy rara vez", value: "b", points: 3 },
@@ -108,7 +108,7 @@ export const section5: Section = {
     },
     {
       id: 81,
-      text: "¿Tienen algún préstamo familiar o con amigos actualmente?",
+      text: "¿Tenéis algún préstamo familiar o con amigos actualmente?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, menor de 1.000 €", value: "b", points: 3 },
@@ -118,7 +118,7 @@ export const section5: Section = {
     },
     {
       id: 82,
-      text: "¿Tienen algún tipo de deuda con la Administración (Hacienda, Seguridad Social, etc.)?",
+      text: "¿Tenéis algún tipo de deuda con la Administración (Hacienda, Seguridad Social, etc.)?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, pero ya está en trámite de pago", value: "b", points: 3 },
@@ -128,7 +128,7 @@ export const section5: Section = {
     },
     {
       id: 83,
-      text: "¿Han solicitado reunificación de deudas alguna vez?",
+      text: "¿Habéis solicitado reunificación de deudas alguna vez?",
       options: [
         { label: "a) No lo conocemos", value: "a", points: 1 },
         { label: "b) No lo hemos hecho", value: "b", points: 4 },
@@ -138,7 +138,7 @@ export const section5: Section = {
     },
     {
       id: 84,
-      text: "¿Cómo manejan la deuda como pareja?",
+      text: "¿Cómo manejáis la deuda como pareja?",
       options: [
         { label: "a) No tenemos deudas", value: "a", points: 4 },
         { label: "b) Cada uno gestiona la suya", value: "b", points: 2 },
@@ -148,7 +148,7 @@ export const section5: Section = {
     },
     {
       id: 85,
-      text: "¿Qué nivel de preocupación tienen por sus deudas actuales?",
+      text: "¿Qué nivel de preocupación tenéis por vuestras deudas actuales?",
       options: [
         { label: "a) Ninguno", value: "a", points: 4 },
         { label: "b) Bajo", value: "b", points: 3 },
@@ -158,7 +158,7 @@ export const section5: Section = {
     },
     {
       id: 86,
-      text: "¿Tienen un plan específico para reducir o eliminar sus deudas?",
+      text: "¿Tenéis un plan específico para reducir o eliminar vuestras deudas?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Solo una intención", value: "b", points: 2 },
@@ -168,7 +168,7 @@ export const section5: Section = {
     },
     {
       id: 87,
-      text: "¿Qué método siguen para pagar deudas, si tienen varias?",
+      text: "¿Qué método seguís para pagar deudas, si tenéis varias?",
       options: [
         { label: "a) No tenemos deudas", value: "a", points: 4 },
         { label: "b) Pagamos según urgencia o disponibilidad", value: "b", points: 2 },
@@ -178,7 +178,7 @@ export const section5: Section = {
     },
     {
       id: 88,
-      text: "¿Han solicitado alguna vez una tarjeta de crédito por necesidad financiera inmediata?",
+      text: "¿Habéis solicitado alguna vez una tarjeta de crédito por necesidad financiera inmediata?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, una vez", value: "b", points: 3 },
@@ -188,7 +188,7 @@ export const section5: Section = {
     },
     {
       id: 89,
-      text: "¿Les han denegado alguna vez un crédito o financiación?",
+      text: "¿Os han denegado alguna vez un crédito o financiación?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, por falta de ingresos", value: "b", points: 2 },
@@ -198,7 +198,7 @@ export const section5: Section = {
     },
     {
       id: 90,
-      text: "¿Qué parte de sus deudas creen que podrían pagar en los próximos 12 meses?",
+      text: "¿Qué parte de vuestras deudas creeis que podéis pagar en los próximos 12 meses?",
       options: [
         { label: "a) Ninguna", value: "a", points: 1 },
         { label: "b) Menos del 25 %", value: "b", points: 2 },
