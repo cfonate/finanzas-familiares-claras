@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuestionnaire } from "../context/QuestionnaireContext";
 import Question from "./Question";
@@ -49,8 +48,8 @@ const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
     )
   );
 
-  // Añadimos un padding-top extra solo cuando el sticky logo es visible
-  const headerPaddingTop = isStickyLogoVisible ? "pt-20" : "";
+  // Ajusta el padding-top cuando el logo sticky está visible (más alto para evitar que tape el título)
+  const headerPaddingTop = isStickyLogoVisible ? "pt-28" : "pt-0";
 
   return (
     <div className="mb-10">

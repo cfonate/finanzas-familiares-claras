@@ -20,8 +20,8 @@ export const section1: Section = {
       id: 2,
       text: "¿Cuántos hijos tenéis actualmente?",
       options: [
-        { label: "a) 1", value: "a", points: 3 },
-        { label: "b) 2", value: "b", points: 2 },
+        { label: "a) 1", value: "a", points: 2 },
+        { label: "b) 2", value: "b", points: 3 },
         { label: "c) 3 o más", value: "c", points: 1 },
         { label: "d) Ninguno", value: "d", points: 4 },
       ],
@@ -110,3 +110,4 @@ export const section1: Section = {
     },
   ],
 };
+
