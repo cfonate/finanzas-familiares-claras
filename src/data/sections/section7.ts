@@ -18,7 +18,7 @@ export const section7: Section = {
     },
     {
       id: 112,
-      text: "¿Tienen un plan de ahorro para la jubilación?",
+      text: "¿Tenéis un plan de ahorro para la jubilación?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -28,7 +28,7 @@ export const section7: Section = {
     },
     {
       id: 113,
-      text: "¿Tienen un plan de inversión?",
+      text: "¿Tenéis un plan de inversión?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -38,7 +38,7 @@ export const section7: Section = {
     },
     {
       id: 114,
-      text: "¿Tienen un plan de gastos de emergencia?",
+      text: "¿Tenéis un plan de gastos de emergencia (fondo de emergencia)?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -48,7 +48,7 @@ export const section7: Section = {
     },
     {
       id: 115,
-      text: "¿Tienen un plan de gastos de educación?",
+      text: "¿Tenéis un plan de gastos de educación?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -58,7 +58,7 @@ export const section7: Section = {
     },
     {
       id: 116,
-      text: "¿Tienen un plan de gastos de salud?",
+      text: "¿Tenéis un plan de gastos de salud?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -68,7 +68,7 @@ export const section7: Section = {
     },
     {
       id: 117,
-      text: "¿Tienen un plan de gastos de viajes?",
+      text: "¿Tenéis un plan de gastos de viajes?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -78,7 +78,7 @@ export const section7: Section = {
     },
     {
       id: 118,
-      text: "¿Tienen un plan de gastos de tecnología?",
+      text: "¿Tenéis un plan de gastos de tecnología?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -88,7 +88,7 @@ export const section7: Section = {
     },
     {
       id: 119,
-      text: "¿Tienen un plan de gastos de alimentación?",
+      text: "¿Tenéis un plan de gastos de alimentación?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -98,7 +98,7 @@ export const section7: Section = {
     },
     {
       id: 120,
-      text: "¿Tienen un plan de gastos de transporte?",
+      text: "¿Tenéis un plan de gastos de transporte?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
@@ -108,7 +108,7 @@ export const section7: Section = {
     },
     {
       id: 121,
-      text: "¿Tienen un plan de gastos de otros gastos personales?",
+      text: "¿Tenéis un plan de gastos de otros gastos personales?",
       options: [
         { label: "a) No", value: "a", points: 1 },
         { label: "b) Sí, pero no está estructurado", value: "b", points: 2 },
