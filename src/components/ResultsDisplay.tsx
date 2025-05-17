@@ -19,14 +19,13 @@ const ResultsDisplay: React.FC = () => {
         />
         <Card className="p-8 max-w-xl text-center shadow-lg">
           <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: CORPORATE_BLUE }}>
-            ¡Gracias por facilitar sus datos!
+            ¡Gracias por completar el cuestionario!
           </h2>
           <p className="text-lg text-gray-700 mb-6">
-            Hemos recibido correctamente la información y nos pondremos en contacto con usted en breve.
+            Hemos recibido correctamente el cuestionario. Un miembro del equipo va a revisar la información y nos pondremos en contacto contigo en 48 horas.
             <br /><br />
-            <b>El informe será revisado y enviado al administrador (<span style={{ color: CORPORATE_BLUE }}>hola@ipff.es</span>).</b>
+            <b>Si tienes alguna pregunta, puedes escribirnos a (<span style={{ color: CORPORATE_BLUE }}>hola@ipff.es</span>).</b>
             <br />
-            Si tiene consultas, puede escribirnos también a dicho email.
           </p>
         </Card>
       </div>
