@@ -98,7 +98,7 @@ export const section10: Section = {
     },
     {
       id: 170,
-      text: "¿Te gustaría tener una fuente adicional de ingresos en el futuro?",
+      text: "¿Os gustaría tener una fuente adicional de ingresos en el futuro?",
       options: [
         { label: "a) Sí, estamos buscando oportunidades para generar ingresos extra", value: "a", points: 4 },
         { label: "b) No, preferimos enfocarnos en nuestros ingresos actuales", value: "b", points: 3 },
