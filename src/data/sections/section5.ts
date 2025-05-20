@@ -1,4 +1,4 @@
-n´
+
 import { Section } from "../../types/questionTypes";
 
 export const section5: Section = {
