@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("re_B8iLBh2r_PNz7QeURbi594f7eHaugRtSS"));
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +22,9 @@ serve(async (req) => {
 
   try {
     const { to }: TestEmailBody = await req.json();
+
+    // Log para verificar que la API key esté disponible
+    console.log("RESEND_API_KEY disponible:", !!Deno.env.get("RESEND_API_KEY"));
 
     // Envía un correo de prueba
     const { data, error } = await resend.emails.send({

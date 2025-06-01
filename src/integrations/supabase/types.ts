@@ -9,93 +9,13 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      email_queue: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          recipient_email: string
-          recipient_name: string
-          status: string
-          subject: string
-          type: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          recipient_email: string
-          recipient_name: string
-          status?: string
-          subject: string
-          type: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          recipient_email?: string
-          recipient_name?: string
-          status?: string
-          subject?: string
-          type?: string
-        }
-        Relationships: []
-      }
-      form_submissions: {
-        Row: {
-          answers: Json
-          created_at: string
-          email: string
-          first_name: string
-          id: string
-          last_name: string
-          results: Json
-        }
-        Insert: {
-          answers: Json
-          created_at?: string
-          email: string
-          first_name: string
-          id?: string
-          last_name: string
-          results: Json
-        }
-        Update: {
-          answers?: Json
-          created_at?: string
-          email?: string
-          first_name?: string
-          id?: string
-          last_name?: string
-          results?: Json
-        }
-        Relationships: []
-      }
-      preguntas: {
-        Row: {
-          created_at: string
-          id: number
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-        }
-        Update: {
-          created_at?: string
-          id?: number
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
