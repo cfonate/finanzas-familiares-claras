@@ -1,7 +1,10 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Json } from "@/integrations/supabase/types";
+import { Database } from "@/integrations/supabase/types";
+
+type FormSubmission = Database['public']['Tables']['form_submissions']['Row'];
+type EmailQueueItem = Database['public']['Tables']['email_queue']['Row'];
 
 interface Submission {
   id: string;
@@ -13,16 +16,6 @@ interface Submission {
     percentage?: number;
     category?: string;
   };
-}
-
-interface EmailQueueItem {
-  id: string;
-  created_at: string;
-  recipient_name: string;
-  recipient_email: string;
-  subject: string;
-  status: string;
-  type: string;
 }
 
 export const useAdminData = () => {
@@ -42,12 +35,12 @@ export const useAdminData = () => {
       if (submissionsError) throw submissionsError;
 
       // Transform data to match Submission interface
-      const transformedSubmissions: Submission[] = submissionsData.map(item => ({
-        id: item.id as string,
+      const transformedSubmissions: Submission[] = submissionsData.map((item: FormSubmission) => ({
+        id: item.id,
         created_at: item.created_at,
-        first_name: item.first_name as string,
-        last_name: item.last_name as string,
-        email: item.email as string,
+        first_name: item.first_name,
+        last_name: item.last_name,
+        email: item.email,
         results: item.results as { percentage?: number; category?: string }
       }));
 
@@ -208,4 +201,3 @@ export const useAdminData = () => {
     getDateForFilename
   };
 };
-

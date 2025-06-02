@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Answer, QuestionnaireResult } from "../types/questionTypes";
+import { Database } from "@/integrations/supabase/types";
 
 export interface UserSubmission {
   firstName: string;
@@ -10,17 +11,21 @@ export interface UserSubmission {
   results: QuestionnaireResult;
 }
 
+type FormSubmissionInsert = Database['public']['Tables']['form_submissions']['Insert'];
+
 export const saveSubmission = async (submission: UserSubmission) => {
   try {
+    const submissionData: FormSubmissionInsert = {
+      first_name: submission.firstName,
+      last_name: submission.lastName,
+      email: submission.email,
+      answers: submission.answers,
+      results: submission.results
+    };
+
     const { data, error } = await supabase
       .from("form_submissions")
-      .insert({
-        first_name: submission.firstName,
-        last_name: submission.lastName,
-        email: submission.email,
-        answers: submission.answers,
-        results: submission.results
-      });
+      .insert(submissionData);
       
     if (error) {
       console.error("Error saving submission:", error);
