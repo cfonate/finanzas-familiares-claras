@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuestionnaireContext } from "@/context/QuestionnaireContext";
+import { saveSubmission, sendEmails } from "@/services/submissionService";
 
 const userInfoSchema = z.object({
   firstName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -29,6 +31,9 @@ interface UserInfoFormProps {
 }
 
 const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { answers, results } = useQuestionnaireContext();
+  
   const form = useForm<UserInfo>({
     resolver: zodResolver(userInfoSchema),
     defaultValues: {
@@ -38,16 +43,60 @@ const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
     },
   });
 
-  const handleSubmit = (data: UserInfo) => {
+  const handleSubmit = async (data: UserInfo) => {
+    setIsSubmitting(true);
+    console.log("Enviando datos del formulario:", data);
+    console.log("Respuestas:", answers);
+    console.log("Resultados:", results);
+    
     try {
+      if (!answers || answers.length === 0) {
+        throw new Error("No hay respuestas disponibles");
+      }
+      
+      if (!results) {
+        throw new Error("No hay resultados disponibles");
+      }
+
+      const submission = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        answers,
+        results
+      };
+
+      console.log("Guardando envío en base de datos...");
+      const saveResult = await saveSubmission(submission);
+      
+      if (!saveResult.success) {
+        throw new Error("Error al guardar los datos");
+      }
+      
+      console.log("Datos guardados exitosamente, enviando emails...");
+      const emailResult = await sendEmails(submission);
+      
+      if (!emailResult.success) {
+        console.error("Error al enviar emails:", emailResult.error);
+        throw new Error("Error al enviar los emails");
+      }
+      
+      console.log("Emails enviados exitosamente");
+      toast({
+        title: "Éxito",
+        description: "Los datos se han guardado y los emails se han enviado correctamente",
+      });
+      
       onSubmit(data);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error en el envío:", error);
       toast({
         title: "Error",
-        description: "Hubo un problema al enviar el formulario",
+        description: error instanceof Error ? error.message : "Hubo un problema al enviar el formulario",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -69,7 +118,7 @@ const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
               <FormItem>
                 <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <Input placeholder="Introduzca su nombre" {...field} />
+                  <Input placeholder="Introduzca su nombre" {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -83,7 +132,7 @@ const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
               <FormItem>
                 <FormLabel>Apellidos</FormLabel>
                 <FormControl>
-                  <Input placeholder="Introduzca sus apellidos" {...field} />
+                  <Input placeholder="Introduzca sus apellidos" {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,7 +146,7 @@ const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="usuario@ejemplo.com" type="email" {...field} />
+                  <Input placeholder="usuario@ejemplo.com" type="email" {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -107,8 +156,9 @@ const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
           <Button
             type="submit"
             className="w-full mt-4 bg-finance-primary hover:bg-finance-primary/80"
+            disabled={isSubmitting}
           >
-            Continuar
+            {isSubmitting ? "Enviando..." : "Continuar"}
           </Button>
         </form>
       </Form>

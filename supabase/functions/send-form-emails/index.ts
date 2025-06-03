@@ -19,24 +19,34 @@ interface EmailRequestBody {
 }
 
 serve(async (req) => {
+  console.log("Función send-form-emails iniciada");
+  console.log("Método:", req.method);
+  console.log("Headers:", Object.fromEntries(req.headers.entries()));
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("Manejando solicitud OPTIONS/CORS");
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const body: EmailRequestBody = await req.json();
+    console.log("Cuerpo de la solicitud recibido:", body);
+    
     const { firstName, lastName, userEmail, results } = body;
     
     if (!firstName || !lastName || !userEmail || !results) {
+      console.error("Campos faltantes:", { firstName, lastName, userEmail, results });
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Almacenamos los correos en la cola para que sean procesados por el sistema de hosting del usuario
+    console.log("Creando cliente de Supabase...");
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    console.log("Insertando emails en la cola...");
     const { data, error } = await supabase
       .from("email_queue")
       .insert([
@@ -82,23 +92,25 @@ serve(async (req) => {
           status: "pending",
           type: "admin"
         }
-      ]);
+      ])
+      .select();
 
     if (error) {
-      console.error("Error al guardar los correos en la cola:", error);
-      
+      console.error("Error al insertar en email_queue:", error);
       return new Response(
-        JSON.stringify({ error: "Failed to queue emails" }),
+        JSON.stringify({ error: "Failed to queue emails", details: error }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    console.log("Emails insertados exitosamente en la cola:", data);
+
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, message: "Emails queued successfully" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error in send-form-emails function:", error);
+    console.error("Error en send-form-emails function:", error);
     
     return new Response(
       JSON.stringify({ error: error.message }),
