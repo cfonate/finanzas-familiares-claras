@@ -6,7 +6,7 @@ import { Resend } from "npm:resend@4.0.0";
 // Required environment variables
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
+const RESEND_API_KEY = "re_2keMQHGa_G3FLLjgjF8mTSiiJ5dPg42em";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,9 +23,12 @@ interface EmailRequestBody {
 const resend = new Resend(RESEND_API_KEY);
 
 serve(async (req) => {
-  console.log("Función send-form-emails iniciada");
-  console.log("Método:", req.method);
-  console.log("RESEND_API_KEY configurado:", !!RESEND_API_KEY);
+  console.log("=== FUNCIÓN SEND-FORM-EMAILS INICIADA ===");
+  console.log("Método HTTP:", req.method);
+  console.log("URL:", req.url);
+  console.log("Headers:", Object.fromEntries(req.headers.entries()));
+  console.log("API Key configurada:", RESEND_API_KEY ? "SÍ" : "NO");
+  console.log("API Key valor:", RESEND_API_KEY);
 
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -34,124 +37,146 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Intentando leer el cuerpo de la solicitud...");
     const body: EmailRequestBody = await req.json();
-    console.log("Cuerpo de la solicitud recibido:", body);
+    console.log("Cuerpo recibido:", JSON.stringify(body, null, 2));
     
     const { firstName, lastName, userEmail, results } = body;
     
     if (!firstName || !lastName || !userEmail || !results) {
-      console.error("Campos faltantes:", { firstName, lastName, userEmail, results });
+      console.error("Campos faltantes:", { firstName, lastName, userEmail, results: !!results });
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (!RESEND_API_KEY) {
-      console.error("RESEND_API_KEY no está configurado");
-      return new Response(
-        JSON.stringify({ error: "Email service not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    console.log("=== ENVIANDO EMAIL AL USUARIO ===");
+    console.log("Destinatario:", userEmail);
+    
+    try {
+      const userEmailResponse = await resend.emails.send({
+        from: "IPFF <hola@ipff.es>",
+        to: [userEmail],
+        subject: "Resultados de su Evaluación Financiera - IPFF",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <img src="https://ipff.es/wp-content/uploads/2025/04/Logo_home.svg" alt="IPFF Logo" style="max-width: 150px; margin-bottom: 20px;">
+            <h1 style="color: #2E5090;">Resultados de su Evaluación Financiera</h1>
+            <p>Estimado/a ${firstName} ${lastName},</p>
+            <p>Gracias por completar nuestro cuestionario de finanzas familiares. Adjunto encontrará un resumen de sus resultados:</p>
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Puntuación total:</strong> ${results.percentage}%</p>
+              <p><strong>Categoría:</strong> ${results.category}</p>
+            </div>
+            <p>Para ver sus resultados completos y recomendaciones personalizadas, puede acceder a nuestro sitio web.</p>
+            <p>Si tiene alguna pregunta, puede escribirnos a <strong>hola@ipff.es</strong></p>
+            <p>Atentamente,</p>
+            <p>El equipo de IPFF</p>
+          </div>
+        `,
+      });
+
+      console.log("RESPUESTA EMAIL USUARIO:", JSON.stringify(userEmailResponse, null, 2));
+      
+      if (userEmailResponse.error) {
+        console.error("ERROR EN EMAIL USUARIO:", userEmailResponse.error);
+        throw new Error(`Error enviando email usuario: ${userEmailResponse.error.message}`);
+      }
+    } catch (userEmailError) {
+      console.error("EXCEPCIÓN AL ENVIAR EMAIL USUARIO:", userEmailError);
+      throw userEmailError;
     }
 
-    console.log("Enviando email al usuario...");
-    // Email al usuario
-    const userEmailResponse = await resend.emails.send({
-      from: "IPFF <hola@ipff.es>",
-      to: [userEmail],
-      subject: "Resultados de su Evaluación Financiera - IPFF",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <img src="https://ipff.es/wp-content/uploads/2025/04/Logo_home.svg" alt="IPFF Logo" style="max-width: 150px; margin-bottom: 20px;">
-          <h1 style="color: #2E5090;">Resultados de su Evaluación Financiera</h1>
-          <p>Estimado/a ${firstName} ${lastName},</p>
-          <p>Gracias por completar nuestro cuestionario de finanzas familiares. Adjunto encontrará un resumen de sus resultados:</p>
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <p><strong>Puntuación total:</strong> ${results.percentage}%</p>
-            <p><strong>Categoría:</strong> ${results.category}</p>
+    console.log("=== ENVIANDO EMAIL AL ADMINISTRADOR ===");
+    
+    try {
+      const adminEmailResponse = await resend.emails.send({
+        from: "IPFF <hola@ipff.es>",
+        to: ["francincarlos@gmail.com"],
+        subject: "Nueva Evaluación Financiera Completada - IPFF",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #2E5090;">Nueva Evaluación Completada</h1>
+            <p>Un usuario ha completado el cuestionario de finanzas familiares:</p>
+            <ul>
+              <li><strong>Nombre:</strong> ${firstName} ${lastName}</li>
+              <li><strong>Email:</strong> ${userEmail}</li>
+              <li><strong>Puntuación:</strong> ${results.percentage}%</li>
+              <li><strong>Categoría:</strong> ${results.category}</li>
+              <li><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</li>
+            </ul>
+            <h2>Detalles completos:</h2>
+            <pre>${JSON.stringify(results, null, 2)}</pre>
           </div>
-          <p>Para ver sus resultados completos y recomendaciones personalizadas, puede acceder a nuestro sitio web.</p>
-          <p>Si tiene alguna pregunta, puede escribirnos a <strong>hola@ipff.es</strong></p>
-          <p>Atentamente,</p>
-          <p>El equipo de IPFF</p>
-        </div>
-      `,
-    });
+        `,
+      });
 
-    console.log("Respuesta email usuario:", userEmailResponse);
+      console.log("RESPUESTA EMAIL ADMINISTRADOR:", JSON.stringify(adminEmailResponse, null, 2));
+      
+      if (adminEmailResponse.error) {
+        console.error("ERROR EN EMAIL ADMINISTRADOR:", adminEmailResponse.error);
+        throw new Error(`Error enviando email administrador: ${adminEmailResponse.error.message}`);
+      }
+    } catch (adminEmailError) {
+      console.error("EXCEPCIÓN AL ENVIAR EMAIL ADMINISTRADOR:", adminEmailError);
+      throw adminEmailError;
+    }
 
-    console.log("Enviando email al administrador...");
-    // Email al administrador
-    const adminEmailResponse = await resend.emails.send({
-      from: "IPFF <hola@ipff.es>",
-      to: ["francincarlos@gmail.com"],
-      subject: "Nueva Evaluación Financiera Completada - IPFF",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #2E5090;">Nueva Evaluación Completada</h1>
-          <p>Un usuario ha completado el cuestionario de finanzas familiares:</p>
-          <ul>
-            <li><strong>Nombre:</strong> ${firstName} ${lastName}</li>
-            <li><strong>Email:</strong> ${userEmail}</li>
-            <li><strong>Puntuación:</strong> ${results.percentage}%</li>
-            <li><strong>Categoría:</strong> ${results.category}</li>
-            <li><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</li>
-          </ul>
-          <p>Puedes revisar más detalles en el panel de administración.</p>
-        </div>
-      `,
-    });
-
-    console.log("Respuesta email administrador:", adminEmailResponse);
-
-    // Guardar en base de datos para registro
-    console.log("Guardando registro en base de datos...");
+    console.log("=== GUARDANDO EN BASE DE DATOS ===");
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    const { data, error } = await supabase
-      .from("email_queue")
-      .insert([
-        {
-          recipient_name: `${firstName} ${lastName}`,
-          recipient_email: userEmail,
-          subject: "Resultados de su Evaluación Financiera - IPFF",
-          content: "Email enviado via Resend",
-          status: "sent",
-          type: "user"
-        },
-        {
-          recipient_name: "Administrador IPFF",
-          recipient_email: "francincarlos@gmail.com",
-          subject: "Nueva Evaluación Financiera Completada - IPFF",
-          content: "Email enviado via Resend",
-          status: "sent",
-          type: "admin"
-        }
-      ])
-      .select();
+    try {
+      const { data, error } = await supabase
+        .from("email_queue")
+        .insert([
+          {
+            recipient_name: `${firstName} ${lastName}`,
+            recipient_email: userEmail,
+            subject: "Resultados de su Evaluación Financiera - IPFF",
+            content: "Email enviado via Resend",
+            status: "sent",
+            type: "user"
+          },
+          {
+            recipient_name: "Administrador IPFF",
+            recipient_email: "francincarlos@gmail.com",
+            subject: "Nueva Evaluación Financiera Completada - IPFF",
+            content: "Email enviado via Resend",
+            status: "sent",
+            type: "admin"
+          }
+        ])
+        .select();
 
-    if (error) {
-      console.error("Error al guardar en email_queue:", error);
-    } else {
-      console.log("Registros guardados en email_queue:", data);
+      if (error) {
+        console.error("Error guardando en BD:", error);
+      } else {
+        console.log("Registros guardados:", data);
+      }
+    } catch (dbError) {
+      console.error("EXCEPCIÓN EN BASE DE DATOS:", dbError);
     }
 
+    console.log("=== FUNCIÓN COMPLETADA EXITOSAMENTE ===");
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Emails sent successfully",
-        userEmailId: userEmailResponse.data?.id,
-        adminEmailId: adminEmailResponse.data?.id
+        message: "Emails sent successfully"
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
+
   } catch (error) {
-    console.error("Error en send-form-emails function:", error);
+    console.error("=== ERROR GENERAL EN LA FUNCIÓN ===");
+    console.error("Tipo de error:", error.constructor.name);
+    console.error("Mensaje:", error.message);
+    console.error("Stack:", error.stack);
     
     return new Response(
       JSON.stringify({ 
         error: error.message,
+        type: error.constructor.name,
         details: error.stack 
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
