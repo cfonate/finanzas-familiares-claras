@@ -58,21 +58,17 @@ serve(async (req) => {
       const userEmailResponse = await resend.emails.send({
         from: "IPFF <hola@ipff.es>",
         to: [userEmail],
-        subject: "Resultados de su Evaluación Financiera - IPFF",
+        subject: "Resultados de vuestra Evaluación Financiera - IPFF",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <img src="https://ipff.es/wp-content/uploads/2025/04/Logo_home.svg" alt="IPFF Logo" style="max-width: 150px; margin-bottom: 20px;">
             <h1 style="color: #2E5090;">Resultados de su Evaluación Financiera</h1>
             <p>Estimado/a ${firstName} ${lastName},</p>
-            <p>Gracias por completar nuestro cuestionario de finanzas familiares. Adjunto encontrará un resumen de sus resultados:</p>
-            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p><strong>Puntuación total:</strong> ${results.percentage}%</p>
-              <p><strong>Categoría:</strong> ${results.category}</p>
-            </div>
-            <p>Para ver sus resultados completos y recomendaciones personalizadas, puede acceder a nuestro sitio web.</p>
-            <p>Si tiene alguna pregunta, puede escribirnos a <strong>hola@ipff.es</strong></p>
+            <p>Gracias por completar nuestro cuestionario de finanzas familiares.</p>
+            <p>Hemos recibido correctamente el cuestionario y en un plazo de 24 a 48 horas recibirás el resultado, una vez que nuestro equipo lo haya analizado</p>
+            <p>Si tienes alguna pregunta, puedes escribirnos a <strong>hola@ipff.es</strong></p>
             <p>Atentamente,</p>
-            <p>El equipo de IPFF</p>
+            <p>El equipo del Instituto de Planificación Financiera Familiar</p>
           </div>
         `,
       });
@@ -93,7 +89,7 @@ serve(async (req) => {
     try {
       const adminEmailResponse = await resend.emails.send({
         from: "IPFF <hola@ipff.es>",
-        to: ["francincarlos@gmail.com"],
+        to: ["hola@ipff.es"],
         subject: "Nueva Evaluación Financiera Completada - IPFF",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -108,6 +104,10 @@ serve(async (req) => {
             </ul>
             <h2>Detalles completos:</h2>
             <pre>${JSON.stringify(results, null, 2)}</pre>
+                      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Puntuación total:</strong> ${results.percentage}%</p>
+              <p><strong>Categoría:</strong> ${results.category}</p>
+            </div>
           </div>
         `,
       });
