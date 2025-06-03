@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuestionnaireContext } from "@/context/QuestionnaireContext";
+import { useQuestionnaire } from "@/context/QuestionnaireContext";
 import { saveSubmission, sendEmails } from "@/services/submissionService";
 
 const userInfoSchema = z.object({
@@ -32,7 +32,7 @@ interface UserInfoFormProps {
 
 const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { answers, results } = useQuestionnaireContext();
+  const { answers, results } = useQuestionnaire();
   
   const form = useForm<UserInfo>({
     resolver: zodResolver(userInfoSchema),
