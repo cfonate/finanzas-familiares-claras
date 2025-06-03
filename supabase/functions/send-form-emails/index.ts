@@ -53,7 +53,7 @@ serve(async (req) => {
         {
           recipient_name: `${firstName} ${lastName}`,
           recipient_email: userEmail,
-          subject: "Resultados de su Evaluación Financiera",
+          subject: "Resultados de su Evaluación Financiera - IPFF",
           content: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <img src="https://ipff.es/wp-content/uploads/2025/04/Logo_home.svg" alt="IPFF Logo" style="max-width: 150px; margin-bottom: 20px;">
@@ -65,6 +65,7 @@ serve(async (req) => {
                 <p><strong>Categoría:</strong> ${results.category}</p>
               </div>
               <p>Para ver sus resultados completos y recomendaciones personalizadas, puede acceder a nuestro sitio web.</p>
+              <p>Si tiene alguna pregunta, puede escribirnos a <strong>hola@ipff.es</strong></p>
               <p>Atentamente,</p>
               <p>El equipo de IPFF</p>
             </div>
@@ -74,8 +75,8 @@ serve(async (req) => {
         },
         {
           recipient_name: "Administrador IPFF",
-          recipient_email: "hola@ipff.es",
-          subject: "Nueva Evaluación Financiera Completada",
+          recipient_email: "francincarlos@gmail.com",
+          subject: "Nueva Evaluación Financiera Completada - IPFF",
           content: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h1 style="color: #2E5090;">Nueva Evaluación Completada</h1>
@@ -85,8 +86,9 @@ serve(async (req) => {
                 <li><strong>Email:</strong> ${userEmail}</li>
                 <li><strong>Puntuación:</strong> ${results.percentage}%</li>
                 <li><strong>Categoría:</strong> ${results.category}</li>
-                <li><strong>Fecha:</strong> ${new Date().toLocaleString()}</li>
+                <li><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</li>
               </ul>
+              <p>Puedes revisar más detalles en el panel de administración.</p>
             </div>
           `,
           status: "pending",
@@ -106,7 +108,11 @@ serve(async (req) => {
     console.log("Emails insertados exitosamente en la cola:", data);
 
     return new Response(
-      JSON.stringify({ success: true, message: "Emails queued successfully" }),
+      JSON.stringify({ 
+        success: true, 
+        message: "Emails queued successfully",
+        emailsCreated: data?.length || 0
+      }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
