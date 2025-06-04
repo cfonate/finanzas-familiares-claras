@@ -28,7 +28,6 @@ serve(async (req) => {
   console.log("URL:", req.url);
   console.log("Headers:", Object.fromEntries(req.headers.entries()));
   console.log("API Key configurada:", RESEND_API_KEY ? "SÍ" : "NO");
-  console.log("API Key valor:", RESEND_API_KEY);
 
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -51,22 +50,22 @@ serve(async (req) => {
       );
     }
 
-    console.log("=== ENVIANDO EMAIL AL USUARIO ===");
+    console.log("=== ENVIANDO EMAIL DE CONFIRMACIÓN AL USUARIO ===");
     console.log("Destinatario:", userEmail);
     
     try {
       const userEmailResponse = await resend.emails.send({
         from: "IPFF <hola@ipff.es>",
         to: [userEmail],
-        subject: "Resultados de vuestra Evaluación Financiera - IPFF",
+        subject: "Hemos recibido tu cuestionario - IPFF",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <img src="https://ipff.es/wp-content/uploads/2025/04/Logo_home.svg" alt="IPFF Logo" style="max-width: 150px; margin-bottom: 20px;">
-            <h1 style="color: #2E5090;">Resultados de su Evaluación Financiera</h1>
+            <h1 style="color: #2E5090;">¡Gracias por completar el cuestionario!</h1>
             <p>Estimado/a ${firstName} ${lastName},</p>
-            <p>Gracias por completar nuestro cuestionario de finanzas familiares.</p>
-            <p>Hemos recibido correctamente el cuestionario y en un plazo de 24 a 48 horas recibirás el resultado, una vez que nuestro equipo lo haya analizado</p>
-            <p>Si tienes alguna pregunta, puedes escribirnos a <strong>hola@ipff.es</strong></p>
+            <p>Hemos recibido correctamente tu cuestionario de finanzas familiares.</p>
+            <p><strong>Un miembro de nuestro equipo revisará tu información y se pondrá en contacto contigo en un plazo de 24 a 48 horas.</strong></p>
+            <p>Si tienes alguna pregunta urgente, puedes escribirnos a <strong>hola@ipff.es</strong></p>
             <p>Atentamente,</p>
             <p>El equipo del Instituto de Planificación Financiera Familiar</p>
           </div>
@@ -84,30 +83,100 @@ serve(async (req) => {
       throw userEmailError;
     }
 
-    console.log("=== ENVIANDO EMAIL AL ADMINISTRADOR ===");
+    console.log("=== ENVIANDO EMAIL COMPLETO AL ADMINISTRADOR ===");
+    console.log("Enviando a: hola@ipff.es");
     
+    // Crear el contenido detallado de los resultados
+    const createSectionDetails = () => {
+      if (!results.sectionScores || !Array.isArray(results.sectionScores)) {
+        return "<p>No se encontraron detalles por sección</p>";
+      }
+      
+      const sectionNames = {
+        1: "Situación Familiar",
+        2: "Ingresos", 
+        3: "Gastos",
+        4: "Ahorro",
+        5: "Deudas",
+        6: "Seguros",
+        7: "Planificación Financiera",
+        8: "Ingresos Adicionales",
+        9: "Inversiones",
+        10: "Objetivos a Largo Plazo",
+        11: "Hábitos Financieros"
+      };
+      
+      return results.sectionScores.map(section => `
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><strong>${sectionNames[section.sectionId] || `Sección ${section.sectionId}`}</strong></td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${section.score}/${section.total}</td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${section.percentage}%</td>
+        </tr>
+      `).join('');
+    };
+
+    const createRecommendationsList = () => {
+      if (!results.recommendations || !Array.isArray(results.recommendations)) {
+        return "<p>No hay recomendaciones disponibles</p>";
+      }
+      
+      return results.recommendations.map(rec => `<li style="margin-bottom: 8px;">${rec}</li>`).join('');
+    };
+
     try {
       const adminEmailResponse = await resend.emails.send({
         from: "IPFF <hola@ipff.es>",
         to: ["hola@ipff.es"],
         subject: "Nueva Evaluación Financiera Completada - IPFF",
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #2E5090;">Nueva Evaluación Completada</h1>
-            <p>Un usuario ha completado el cuestionario de finanzas familiares:</p>
-            <ul>
-              <li><strong>Nombre:</strong> ${firstName} ${lastName}</li>
-              <li><strong>Email:</strong> ${userEmail}</li>
-              <li><strong>Puntuación:</strong> ${results.percentage}%</li>
-              <li><strong>Categoría:</strong> ${results.category}</li>
-              <li><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</li>
-            </ul>
-            <h2>Detalles completos:</h2>
-            <pre>${JSON.stringify(results, null, 2)}</pre>
-                      <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p><strong>Puntuación total:</strong> ${results.percentage}%</p>
-              <p><strong>Categoría:</strong> ${results.category}</p>
+          <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
+            <img src="https://ipff.es/wp-content/uploads/2025/04/Logo_home.svg" alt="IPFF Logo" style="max-width: 150px; margin-bottom: 20px;">
+            <h1 style="color: #2E5090;">Nueva Evaluación Financiera Completada</h1>
+            
+            <h2 style="color: #2E5090;">Información del Usuario</h2>
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Nombre:</strong> ${firstName} ${lastName}</p>
+              <p><strong>Email:</strong> ${userEmail}</p>
+              <p><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</p>
             </div>
+
+            <h2 style="color: #2E5090;">Resumen de Resultados</h2>
+            <div style="background-color: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Puntuación Total:</strong> ${results.totalScore}/${results.maxPossibleScore} puntos (${results.percentage}%)</p>
+              <p><strong>Categoría:</strong> <span style="font-size: 18px; font-weight: bold; color: #2E5090;">${results.category}</span></p>
+            </div>
+
+            <h2 style="color: #2E5090;">Análisis Detallado por Sección</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <thead>
+                <tr style="background-color: #2E5090; color: white;">
+                  <th style="padding: 10px; border: 1px solid #ddd;">Sección</th>
+                  <th style="padding: 10px; border: 1px solid #ddd;">Puntuación</th>
+                  <th style="padding: 10px; border: 1px solid #ddd;">Porcentaje</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${createSectionDetails()}
+              </tbody>
+            </table>
+
+            <h2 style="color: #2E5090;">Recomendaciones Personalizadas</h2>
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <ol style="margin: 0; padding-left: 20px;">
+                ${createRecommendationsList()}
+              </ol>
+            </div>
+
+            <h2 style="color: #2E5090;">Datos Técnicos Completos</h2>
+            <details style="margin: 20px 0;">
+              <summary style="cursor: pointer; font-weight: bold; margin-bottom: 10px;">Ver datos técnicos completos</summary>
+              <pre style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 12px; border: 1px solid #dee2e6;">${JSON.stringify(results, null, 2)}</pre>
+            </details>
+
+            <hr style="margin: 30px 0;">
+            <p style="color: #666; font-size: 12px;">
+              Este email ha sido generado automáticamente por el sistema de evaluación financiera del IPFF.
+            </p>
           </div>
         `,
       });
@@ -133,16 +202,16 @@ serve(async (req) => {
           {
             recipient_name: `${firstName} ${lastName}`,
             recipient_email: userEmail,
-            subject: "Resultados de su Evaluación Financiera - IPFF",
-            content: "Email enviado via Resend",
+            subject: "Hemos recibido tu cuestionario - IPFF",
+            content: "Email de confirmación enviado via Resend",
             status: "sent",
             type: "user"
           },
           {
             recipient_name: "Administrador IPFF",
-            recipient_email: "francincarlos@gmail.com",
+            recipient_email: "hola@ipff.es",
             subject: "Nueva Evaluación Financiera Completada - IPFF",
-            content: "Email enviado via Resend",
+            content: "Email con resultados completos enviado via Resend",
             status: "sent",
             type: "admin"
           }
@@ -162,7 +231,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Emails sent successfully"
+        message: "Emails sent successfully",
+        userEmail: userEmail,
+        adminEmail: "hola@ipff.es"
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
