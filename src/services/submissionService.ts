@@ -13,6 +13,10 @@ export interface UserSubmission {
 
 type FormSubmissionInsert = Database['public']['Tables']['form_submissions']['Insert'];
 
+// Supabase configuration constants
+const SUPABASE_URL = "https://zjrwvcdjbypdxldtcaws.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpqcnd2Y2RqYnlwZHhsZHRjYXdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxNzI0MjksImV4cCI6MjA2MTc0ODQyOX0.5vNVgdgcep_0v_B8aLeyAKZwioKLENBO895_V4QZVk8";
+
 export const saveSubmission = async (submission: UserSubmission) => {
   console.log("=== INICIANDO GUARDADO DE ENVÍO ===");
   console.log("Datos del envío:", {
@@ -25,8 +29,9 @@ export const saveSubmission = async (submission: UserSubmission) => {
   
   // Verificar configuración de Supabase
   console.log("Configuración Supabase:", {
-    url: supabase.supabaseUrl,
-    hasKey: !!supabase.supabaseKey
+    url: SUPABASE_URL,
+    hasKey: !!SUPABASE_ANON_KEY,
+    currentDomain: window.location.origin
   });
 
   try {
@@ -69,6 +74,7 @@ export const saveSubmission = async (submission: UserSubmission) => {
 export const sendEmails = async (submission: UserSubmission) => {
   console.log("=== INICIANDO ENVÍO DE EMAILS ===");
   console.log("Email destinatario:", submission.email);
+  console.log("Dominio actual:", window.location.origin);
   
   try {
     const { firstName, lastName, email, results } = submission;
@@ -81,7 +87,7 @@ export const sendEmails = async (submission: UserSubmission) => {
     };
     
     // Determinar la URL base según el entorno
-    const functionUrl = `${supabase.supabaseUrl}/functions/v1/send-form-emails`;
+    const functionUrl = `${SUPABASE_URL}/functions/v1/send-form-emails`;
     
     console.log("URL de función:", functionUrl);
     console.log("Cuerpo de la solicitud:", {
@@ -95,7 +101,7 @@ export const sendEmails = async (submission: UserSubmission) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${supabase.supabaseKey}`
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
       },
       body: JSON.stringify(requestBody)
     });
