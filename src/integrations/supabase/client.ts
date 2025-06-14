@@ -6,6 +6,12 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://zjrwvcdjbypdxldtcaws.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpqcnd2Y2RqYnlwZHhsZHRjYXdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxNzI0MjksImV4cCI6MjA2MTc0ODQyOX0.5vNVgdgcep_0v_B8aLeyAKZwioKLENBO895_V4QZVk8";
 
+// Verificar que las variables de entorno están disponibles
+console.log("=== CONFIGURACIÓN SUPABASE CLIENT ===");
+console.log("URL:", SUPABASE_URL);
+console.log("Key disponible:", !!SUPABASE_PUBLISHABLE_KEY);
+console.log("Entorno actual:", window.location.origin);
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
