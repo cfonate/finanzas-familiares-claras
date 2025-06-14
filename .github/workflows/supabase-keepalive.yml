@@ -1,0 +1,15 @@
+
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Cada lunes a las 08:00 UTC (ajusta si deseas)
+    - cron: '0 8 * * 1'
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Ping Supabase REST endpoint"
+        run: |
+          curl -sSL -w "%{http_code}" -o /dev/null "https://zjrwvcdjbypdxldtcaws.supabase.co/rest/v1/"
