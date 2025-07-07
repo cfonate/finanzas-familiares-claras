@@ -1,15 +1,71 @@
 
-name: Supabase Keep Alive
+name: Supabase Keepalive
 
 on:
   schedule:
-    # Cada lunes a las 08:00 UTC (ajusta si deseas)
-    - cron: '0 8 * * 1'
+    - cron: "0 9 * * 1,4" # Runs every Monday and Thursday at 9:00 AM UTC
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
-  keepalive:
+  ping_supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: "Ping Supabase REST endpoint"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
         run: |
-          curl -sSL -w "%{http_code}" -o /dev/null "https://zjrwvcdjbypdxldtcaws.supabase.co/rest/v1/"
+          python -m pip install --upgrade pip
+          pip install supabase
+
+      - name: Ping Supabase Database
+        env:
+          SUPABASE_URL: https://zjrwvcdjbypdxldtcaws.supabase.co
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          from supabase import create_client, Client
+          import os
+          from datetime import datetime
+
+          supabase_url = os.environ.get('SUPABASE_URL')
+          supabase_key = os.environ.get('SUPABASE_SERVICE_KEY')
+
+          if not supabase_url or not supabase_key:
+              print('Missing Supabase credentials')
+              exit(1)
+
+          supabase: Client = create_client(supabase_url, supabase_key)
+
+          try:
+              # Ping the form_submissions table
+              response = supabase.table('form_submissions').select('id').limit(1).execute()
+              print(f'✅ Supabase ping successful at {datetime.now().isoformat()}')
+              print(f'Database responded with {len(response.data)} records')
+              
+              # Also ping the email_queue table to keep it active
+              response2 = supabase.table('email_queue').select('id').limit(1).execute()
+              print(f'✅ Email queue ping successful - {len(response2.data)} records')
+              
+          except Exception as e:
+              print(f'❌ Error pinging Supabase: {e}')
+              exit(1)
+          "
+
+      - name: Test Edge Function
+        env:
+          SUPABASE_URL: https://zjrwvcdjbypdxldtcaws.supabase.co
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          curl -X POST \
+            "$SUPABASE_URL/functions/v1/send-test-email" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"test": true}' \
+            --max-time 30 \
+            --retry 2 || echo "Edge function ping failed, but continuing..."
