@@ -6,7 +6,7 @@ import { Resend } from "npm:resend@4.0.0";
 // Required environment variables
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
-const RESEND_API_KEY = "re_2keMQHGa_G3FLLjgjF8mTSiiJ5dPg42em";
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,13 +20,26 @@ interface EmailRequestBody {
   results: any;
 }
 
+// Validate required environment variables
+if (!RESEND_API_KEY) {
+  console.error("RESEND_API_KEY is not configured");
+}
+
 const resend = new Resend(RESEND_API_KEY);
+
+// HTML sanitization function
+function sanitizeHtml(html: string): string {
+  return html
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\//g, "&#x2F;");
+}
 
 serve(async (req) => {
   console.log("=== FUNCIÓN SEND-FORM-EMAILS INICIADA ===");
   console.log("Método HTTP:", req.method);
-  console.log("URL:", req.url);
-  console.log("Headers:", Object.fromEntries(req.headers.entries()));
   console.log("API Key configurada:", RESEND_API_KEY ? "SÍ" : "NO");
 
   // Handle CORS preflight requests
@@ -35,10 +48,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  if (!RESEND_API_KEY) {
+    console.error("RESEND_API_KEY no está configurada");
+    return new Response(
+      JSON.stringify({ error: "Email service not configured" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
   try {
     console.log("Intentando leer el cuerpo de la solicitud...");
     const body: EmailRequestBody = await req.json();
-    console.log("Cuerpo recibido:", JSON.stringify(body, null, 2));
     
     const { firstName, lastName, userEmail, results } = body;
     
@@ -49,6 +69,10 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Sanitize user input
+    const safeFirstName = sanitizeHtml(firstName);
+    const safeLastName = sanitizeHtml(lastName);
 
     console.log("=== ENVIANDO EMAIL DE CONFIRMACIÓN AL USUARIO ===");
     console.log("Destinatario:", userEmail);
@@ -62,7 +86,7 @@ serve(async (req) => {
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <img src="https://ipff.es/wp-content/uploads/2025/04/Logo_home.svg" alt="IPFF Logo" style="max-width: 150px; margin-bottom: 20px;">
             <h1 style="color: #2E5090;">¡Gracias por completar el cuestionario!</h1>
-            <p>Estimado/a ${firstName} ${lastName},</p>
+            <p>Estimado/a ${safeFirstName} ${safeLastName},</p>
             <p>Hemos recibido correctamente tu cuestionario de finanzas familiares.</p>
             <p><strong>Un miembro de nuestro equipo revisará tu información y se pondrá en contacto contigo en un plazo de 24 a 48 horas.</strong></p>
             <p>Si tienes alguna pregunta urgente, puedes escribirnos a <strong>hola@ipff.es</strong></p>
@@ -72,7 +96,7 @@ serve(async (req) => {
         `,
       });
 
-      console.log("RESPUESTA EMAIL USUARIO:", JSON.stringify(userEmailResponse, null, 2));
+      console.log("Email usuario enviado exitosamente");
       
       if (userEmailResponse.error) {
         console.error("ERROR EN EMAIL USUARIO:", userEmailResponse.error);
@@ -84,9 +108,8 @@ serve(async (req) => {
     }
 
     console.log("=== ENVIANDO EMAIL COMPLETO AL ADMINISTRADOR ===");
-    console.log("Enviando a: hola@ipff.es");
     
-    // Crear el contenido detallado de los resultados
+    // Create the detailed results content
     const createSectionDetails = () => {
       if (!results.sectionScores || !Array.isArray(results.sectionScores)) {
         return "<p>No se encontraron detalles por sección</p>";
@@ -120,7 +143,7 @@ serve(async (req) => {
         return "<p>No hay recomendaciones disponibles</p>";
       }
       
-      return results.recommendations.map(rec => `<li style="margin-bottom: 8px;">${rec}</li>`).join('');
+      return results.recommendations.map(rec => `<li style="margin-bottom: 8px;">${sanitizeHtml(rec)}</li>`).join('');
     };
 
     try {
@@ -135,7 +158,7 @@ serve(async (req) => {
             
             <h2 style="color: #2E5090;">Información del Usuario</h2>
             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p><strong>Nombre:</strong> ${firstName} ${lastName}</p>
+              <p><strong>Nombre:</strong> ${safeFirstName} ${safeLastName}</p>
               <p><strong>Email:</strong> ${userEmail}</p>
               <p><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</p>
             </div>
@@ -143,7 +166,7 @@ serve(async (req) => {
             <h2 style="color: #2E5090;">Resumen de Resultados</h2>
             <div style="background-color: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p><strong>Puntuación Total:</strong> ${results.totalScore}/${results.maxPossibleScore} puntos (${results.percentage}%)</p>
-              <p><strong>Categoría:</strong> <span style="font-size: 18px; font-weight: bold; color: #2E5090;">${results.category}</span></p>
+              <p><strong>Categoría:</strong> <span style="font-size: 18px; font-weight: bold; color: #2E5090;">${sanitizeHtml(results.category)}</span></p>
             </div>
 
             <h2 style="color: #2E5090;">Análisis Detallado por Sección</h2>
@@ -167,12 +190,6 @@ serve(async (req) => {
               </ol>
             </div>
 
-            <h2 style="color: #2E5090;">Datos Técnicos Completos</h2>
-            <details style="margin: 20px 0;">
-              <summary style="cursor: pointer; font-weight: bold; margin-bottom: 10px;">Ver datos técnicos completos</summary>
-              <pre style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 12px; border: 1px solid #dee2e6;">${JSON.stringify(results, null, 2)}</pre>
-            </details>
-
             <hr style="margin: 30px 0;">
             <p style="color: #666; font-size: 12px;">
               Este email ha sido generado automáticamente por el sistema de evaluación financiera del IPFF.
@@ -181,7 +198,7 @@ serve(async (req) => {
         `,
       });
 
-      console.log("RESPUESTA EMAIL ADMINISTRADOR:", JSON.stringify(adminEmailResponse, null, 2));
+      console.log("Email administrador enviado exitosamente");
       
       if (adminEmailResponse.error) {
         console.error("ERROR EN EMAIL ADMINISTRADOR:", adminEmailResponse.error);
@@ -200,7 +217,7 @@ serve(async (req) => {
         .from("email_queue")
         .insert([
           {
-            recipient_name: `${firstName} ${lastName}`,
+            recipient_name: `${safeFirstName} ${safeLastName}`,
             recipient_email: userEmail,
             subject: "Hemos recibido tu cuestionario - IPFF",
             content: "Email de confirmación enviado via Resend",
@@ -221,7 +238,7 @@ serve(async (req) => {
       if (error) {
         console.error("Error guardando en BD:", error);
       } else {
-        console.log("Registros guardados:", data);
+        console.log("Registros guardados exitosamente");
       }
     } catch (dbError) {
       console.error("EXCEPCIÓN EN BASE DE DATOS:", dbError);
@@ -242,13 +259,11 @@ serve(async (req) => {
     console.error("=== ERROR GENERAL EN LA FUNCIÓN ===");
     console.error("Tipo de error:", error.constructor.name);
     console.error("Mensaje:", error.message);
-    console.error("Stack:", error.stack);
     
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        type: error.constructor.name,
-        details: error.stack 
+        error: "Internal server error",
+        type: error.constructor.name
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

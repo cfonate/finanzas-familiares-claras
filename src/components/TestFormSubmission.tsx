@@ -15,7 +15,7 @@ const TestFormSubmission = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<string>('');
 
-  // Datos mock para testing
+  // Mock data for testing
   const mockAnswers: Answer[] = [
     { questionId: 1, sectionId: 1, selectedOption: "Tengo un presupuesto detallado", points: 3 },
     { questionId: 2, sectionId: 1, selectedOption: "Ahorro regularmente", points: 3 },
@@ -44,8 +44,16 @@ const TestFormSubmission = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!firstName || !lastName || !email) {
+    // Input validation
+    if (!firstName?.trim() || !lastName?.trim() || !email?.trim()) {
       setResult('Por favor, completa todos los campos');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setResult('Por favor, introduce un email válido');
       return;
     }
 
@@ -54,17 +62,16 @@ const TestFormSubmission = () => {
 
     try {
       const submission = {
-        firstName,
-        lastName,
-        email,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
         answers: mockAnswers,
         results: mockResults
       };
 
       console.log('=== INICIANDO TEST DE ENVÍO COMPLETO ===');
-      console.log('Datos de prueba:', submission);
 
-      // Paso 1: Guardar en base de datos
+      // Step 1: Save to database
       const saveResult = await saveSubmission(submission);
       
       if (!saveResult.success) {
@@ -73,7 +80,7 @@ const TestFormSubmission = () => {
 
       console.log('✅ Guardado en BD exitoso');
 
-      // Paso 2: Enviar emails
+      // Step 2: Send emails
       const emailResult = await sendEmails(submission);
       
       if (!emailResult.success) {
@@ -84,14 +91,14 @@ const TestFormSubmission = () => {
 
       setResult('✅ Test completado exitosamente! Se guardó en la base de datos y se enviaron los emails.');
       
-      // Limpiar formulario
+      // Clear form
       setFirstName('');
       setLastName('');
       setEmail('');
 
     } catch (error) {
       console.error('❌ Error en test:', error);
-      setResult(`❌ Error: ${error.message}`);
+      setResult(`❌ Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     } finally {
       setIsLoading(false);
     }
@@ -105,35 +112,41 @@ const TestFormSubmission = () => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="firstName">Nombre</Label>
+            <Label htmlFor="firstName">Nombre *</Label>
             <Input
               id="firstName"
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="Ingresa tu nombre"
+              required
+              maxLength={50}
             />
           </div>
 
           <div>
-            <Label htmlFor="lastName">Apellido</Label>
+            <Label htmlFor="lastName">Apellido *</Label>
             <Input
               id="lastName"
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Ingresa tu apellido"
+              required
+              maxLength={50}
             />
           </div>
 
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Email *</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
+              required
+              maxLength={100}
             />
           </div>
 

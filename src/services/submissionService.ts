@@ -17,21 +17,29 @@ type FormSubmissionInsert = Database['public']['Tables']['form_submissions']['In
 const SUPABASE_URL = "https://zjrwvcdjbypdxldtcaws.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpqcnd2Y2RqYnlwZHhsZHRjYXdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxNzI0MjksImV4cCI6MjA2MTc0ODQyOX0.5vNVgdgcep_0v_B8aLeyAKZwioKLENBO895_V4QZVk8";
 
+// Logging utility for development
+const isDevelopment = import.meta.env.DEV;
+const secureLog = (message: string, data?: any) => {
+  if (isDevelopment) {
+    console.log(message, data);
+  }
+};
+
+const secureError = (message: string, error?: any) => {
+  if (isDevelopment) {
+    console.error(message, error);
+  } else {
+    // In production, log minimal error info
+    console.error(message);
+  }
+};
+
 export const saveSubmission = async (submission: UserSubmission) => {
-  console.log("=== INICIANDO GUARDADO DE ENVÍO ===");
-  console.log("Datos del envío:", {
-    firstName: submission.firstName,
-    lastName: submission.lastName,
+  secureLog("=== INICIANDO GUARDADO DE ENVÍO ===");
+  secureLog("Datos del envío:", {
     email: submission.email,
     answersCount: submission.answers?.length || 0,
     hasResults: !!submission.results
-  });
-  
-  // Verificar configuración de Supabase
-  console.log("Configuración Supabase:", {
-    url: SUPABASE_URL,
-    hasKey: !!SUPABASE_ANON_KEY,
-    currentDomain: window.location.origin
   });
 
   try {
@@ -43,7 +51,7 @@ export const saveSubmission = async (submission: UserSubmission) => {
       results: submission.results
     };
 
-    console.log("Datos para insertar en BD:", submissionData);
+    secureLog("Insertando datos en BD...");
 
     const { data, error } = await supabase
       .from("form_submissions")
@@ -51,30 +59,24 @@ export const saveSubmission = async (submission: UserSubmission) => {
       .select();
       
     if (error) {
-      console.error("=== ERROR DE SUPABASE AL GUARDAR ===");
-      console.error("Código de error:", error.code);
-      console.error("Mensaje:", error.message);
-      console.error("Detalles:", error.details);
-      console.error("Hint:", error.hint);
+      secureError("=== ERROR DE SUPABASE AL GUARDAR ===", {
+        code: error.code,
+        message: error.message
+      });
       throw new Error(`Error de base de datos: ${error.message}`);
     }
     
-    console.log("=== DATOS GUARDADOS EXITOSAMENTE ===");
-    console.log("Respuesta de BD:", data);
+    secureLog("=== DATOS GUARDADOS EXITOSAMENTE ===");
     return { success: true, data };
   } catch (error) {
-    console.error("=== ERROR GENERAL EN SAVESUBMISSION ===");
-    console.error("Tipo de error:", error.constructor.name);
-    console.error("Mensaje de error:", error.message);
-    console.error("Stack trace:", error.stack);
-    return { success: false, error: error.message || "Error desconocido al guardar" };
+    secureError("=== ERROR GENERAL EN SAVESUBMISSION ===", error);
+    return { success: false, error: error instanceof Error ? error.message : "Error desconocido al guardar" };
   }
 };
 
 export const sendEmails = async (submission: UserSubmission) => {
-  console.log("=== INICIANDO ENVÍO DE EMAILS ===");
-  console.log("Email destinatario:", submission.email);
-  console.log("Dominio actual:", window.location.origin);
+  secureLog("=== INICIANDO ENVÍO DE EMAILS ===");
+  secureLog("Email destinatario:", submission.email);
   
   try {
     const { firstName, lastName, email, results } = submission;
@@ -86,16 +88,11 @@ export const sendEmails = async (submission: UserSubmission) => {
       results
     };
     
-    // Determinar la URL base según el entorno
+    // Determine the URL base according to environment
     const functionUrl = `${SUPABASE_URL}/functions/v1/send-form-emails`;
     
-    console.log("URL de función:", functionUrl);
-    console.log("Cuerpo de la solicitud:", {
-      firstName,
-      lastName,
-      userEmail: email,
-      hasResults: !!results
-    });
+    secureLog("URL de función:", functionUrl);
+    secureLog("Enviando solicitud...");
     
     const response = await fetch(functionUrl, {
       method: "POST",
@@ -106,28 +103,22 @@ export const sendEmails = async (submission: UserSubmission) => {
       body: JSON.stringify(requestBody)
     });
 
-    console.log("=== RESPUESTA DEL SERVIDOR DE EMAILS ===");
-    console.log("Status:", response.status);
-    console.log("Status Text:", response.statusText);
-    console.log("Headers:", Object.fromEntries(response.headers.entries()));
+    secureLog("=== RESPUESTA DEL SERVIDOR DE EMAILS ===");
+    secureLog("Status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("=== ERROR EN RESPUESTA DEL SERVIDOR ===");
-      console.error("Texto de error:", errorText);
-      throw new Error(`Error del servidor de emails: ${response.status} - ${errorText}`);
+      secureError("=== ERROR EN RESPUESTA DEL SERVIDOR ===");
+      throw new Error(`Error del servidor de emails: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log("=== RESULTADO DEL ENVÍO DE EMAILS ===");
-    console.log("Resultado:", result);
+    secureLog("=== RESULTADO DEL ENVÍO DE EMAILS ===");
+    secureLog("Emails enviados exitosamente");
 
     return { success: true, data: result };
   } catch (error) {
-    console.error("=== ERROR EN SENDEMAILS ===");
-    console.error("Tipo de error:", error.constructor.name);
-    console.error("Mensaje:", error.message);
-    console.error("Stack trace:", error.stack);
-    return { success: false, error: error.message || "Error desconocido al enviar emails" };
+    secureError("=== ERROR EN SENDEMAILS ===", error);
+    return { success: false, error: error instanceof Error ? error.message : "Error desconocido al enviar emails" };
   }
 };
