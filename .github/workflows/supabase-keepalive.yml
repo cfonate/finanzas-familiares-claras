@@ -3,7 +3,7 @@ name: Supabase Keepalive
 
 on:
   schedule:
-    - cron: "0 9 * * 1,4" # Runs every Monday and Thursday at 9:00 AM UTC
+    - cron: "0 */6 * * *" # Runs every 6 hours to keep project active
   workflow_dispatch: # Allows manual triggering
 
 jobs:
