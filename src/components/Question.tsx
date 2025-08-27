@@ -13,6 +13,24 @@ const Question: React.FC<QuestionProps> = ({ question, sectionId }) => {
   const { answers, addAnswer } = useQuestionnaire();
   const isMobile = useIsMobile();
 
+  // Check if this question should be skipped based on conditions
+  const shouldSkipQuestion = () => {
+    if (!question.condition) return false;
+    
+    const relatedAnswer = answers.find(
+      answer => answer.questionId === question.condition!.questionId && 
+                answer.sectionId === sectionId
+    );
+    
+    if (!relatedAnswer) return false;
+    
+    if (question.condition.action === 'skip') {
+      return relatedAnswer.selectedOption === question.condition.expectedAnswer;
+    }
+    
+    return false;
+  };
+
   const selectedAnswer = answers.find(
     (answer) =>
       answer.questionId === question.id && answer.sectionId === sectionId
@@ -26,6 +44,11 @@ const Question: React.FC<QuestionProps> = ({ question, sectionId }) => {
       points,
     });
   };
+
+  // Don't render if question should be skipped
+  if (shouldSkipQuestion()) {
+    return null;
+  }
 
   return (
     <div className={`question-card ${isMobile ? 'p-4' : 'p-6'}`}>

@@ -42,12 +42,33 @@ const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({
     window.scrollTo(0, 0);
   };
 
-  const allQuestionsAnswered = section.questions.every((question) =>
-    answers.some(
+  // Check if a question should be skipped based on conditions
+  const shouldSkipQuestion = (question: typeof section.questions[0]) => {
+    if (!question.condition) return false;
+    
+    const relatedAnswer = answers.find(
+      answer => answer.questionId === question.condition!.questionId && 
+                answer.sectionId === section.id
+    );
+    
+    if (!relatedAnswer) return false;
+    
+    if (question.condition.action === 'skip') {
+      return relatedAnswer.selectedOption === question.condition.expectedAnswer;
+    }
+    
+    return false;
+  };
+
+  const allQuestionsAnswered = section.questions.every((question) => {
+    // Skip questions that should be hidden
+    if (shouldSkipQuestion(question)) return true;
+    
+    return answers.some(
       (answer) =>
         answer.questionId === question.id && answer.sectionId === section.id
-    )
-  );
+    );
+  });
 
   // Ajustar padding según dispositivo y estado sticky
   const getStickyTopPosition = () => {

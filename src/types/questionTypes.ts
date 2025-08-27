@@ -9,6 +9,11 @@ export type Question = {
   id: number;
   text: string;
   options: Option[];
+  condition?: {
+    questionId: number;
+    expectedAnswer: string;
+    action: 'skip' | 'show';
+  };
 };
 
 export type Section = {
