@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +23,9 @@ const userInfoSchema = z.object({
   firstName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   lastName: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
   email: z.string().email("Por favor introduce un email válido"),
+  privacyAccepted: z.boolean().refine((val) => val === true, {
+    message: "Debes aceptar la política de privacidad para continuar",
+  }),
 });
 
 export type UserInfo = z.infer<typeof userInfoSchema>;
@@ -40,6 +44,7 @@ const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
       firstName: "",
       lastName: "",
       email: "",
+      privacyAccepted: false,
     },
   });
 
@@ -148,6 +153,44 @@ const UserInfoForm: React.FC<UserInfoFormProps> = ({ onSubmit }) => {
                 <FormControl>
                   <Input placeholder="usuario@ejemplo.com" type="email" {...field} disabled={isSubmitting} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="privacyAccepted"
+            render={({ field }) => (
+              <FormItem className="mt-6 space-y-3">
+                <div className="flex items-start space-x-3">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSubmitting}
+                      className="mt-1"
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="text-sm font-normal">
+                      He leído y acepto la{" "}
+                      <a
+                        href="https://ipff.es/aviso-legal-politica-privacidad/#:~:text=Cuestionarios%20de%20autoevaluaci%C3%B3n%3A"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-finance-primary hover:underline"
+                      >
+                        Política de Privacidad
+                      </a>
+                      , autorizando el tratamiento de mis datos personales conforme a lo establecido en ella. 
+                      Declaro, además, que entiendo y acepto que este cuestionario tiene un carácter exclusivamente 
+                      educativo y formativo, no constituye un test de conveniencia o idoneidad regulado conforme a 
+                      la normativa MiFID II y no será utilizado para recomendar productos financieros ni para prestar 
+                      servicios de asesoramiento en materia de inversión.
+                    </FormLabel>
+                  </div>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
