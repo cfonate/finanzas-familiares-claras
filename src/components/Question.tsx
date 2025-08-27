@@ -22,6 +22,15 @@ const Question: React.FC<QuestionProps> = ({ question, sectionId }) => {
                 answer.sectionId === sectionId
     );
     
+    // Debug log for question 8
+    if (question.id === 8 && sectionId === 1) {
+      console.log('Question 8 check:', {
+        condition: question.condition,
+        relatedAnswer: relatedAnswer,
+        shouldSkip: relatedAnswer?.selectedOption === question.condition.expectedAnswer
+      });
+    }
+    
     if (!relatedAnswer) return false;
     
     if (question.condition.action === 'skip') {
