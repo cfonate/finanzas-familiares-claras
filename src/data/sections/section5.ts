@@ -1,4 +1,3 @@
-
 import { Section } from "../../types/questionTypes";
 
 export const section5: Section = {
@@ -8,7 +7,7 @@ export const section5: Section = {
   questions: [
     {
       id: 71,
-      text: "¿Tenéis alguna deuda activa?",
+      text: "¿Tenéis actualmente alguna deuda activa?",
       options: [
         { label: "a) No", value: "a", points: 4 },
         { label: "b) Sí, solo una (crédito personal o tarjeta)", value: "b", points: 3 },
@@ -28,7 +27,7 @@ export const section5: Section = {
     },
     {
       id: 73,
-      text: "¿Qué tipo de deuda es la más relevante actualmente (excluyendo hipoteca)?",
+      text: "¿Qué tipo de deuda es la más relevante actualmente?",
       options: [
         { label: "a) Crédito al consumo o personal", value: "a", points: 2 },
         { label: "b) Tarjeta de crédito", value: "b", points: 1 },
@@ -74,6 +73,7 @@ export const section5: Section = {
         { label: "b) Entre el 10 % y el 25 %", value: "b", points: 3 },
         { label: "c) Entre el 25 % y el 50 %", value: "c", points: 2 },
         { label: "d) Más del 50 %", value: "d", points: 1 },
+        { label: "e) NS/NC", value: "e", points: 0 },
       ],
     },
     {
@@ -141,9 +141,9 @@ export const section5: Section = {
       text: "¿Cómo manejáis la deuda como pareja?",
       options: [
         { label: "a) No tenemos deudas", value: "a", points: 4 },
-        { label: "b) Cada uno gestiona la suya", value: "b", points: 2 },
-        { label: "c) Compartimos la responsabilidad, sin plan", value: "c", points: 3 },
-        { label: "d) Tenemos un plan conjunto y lo seguimos", value: "d", points: 4 },
+        { label: "b) Tenemos un plan conjunto y lo seguimos", value: "b", points: 4 },
+        { label: "c) Compartimos la responsabilidad, sin plan", value: "c", points: 2 },
+        { label: "d) Cada uno gestiona la suya", value: "d", points: 1 },
       ],
     },
     {
@@ -160,10 +160,10 @@ export const section5: Section = {
       id: 86,
       text: "¿Tenéis un plan específico para reducir o eliminar vuestras deudas?",
       options: [
-        { label: "a) No", value: "a", points: 1 },
-        { label: "b) Solo una intención", value: "b", points: 2 },
-        { label: "c) Sí, pero poco estructurado", value: "c", points: 3 },
-        { label: "d) Sí, con fechas y objetivos claros", value: "d", points: 4 },
+        { label: "a) Sí, con fechas y objetivos claros", value: "a", points: 4 },
+        { label: "b) Sí, pero poco estructurado", value: "b", points: 3 },
+        { label: "c) Solo una intención", value: "c", points: 2 },
+        { label: "d) No", value: "d", points: 1 },
       ],
     },
     {
@@ -198,12 +198,12 @@ export const section5: Section = {
     },
     {
       id: 90,
-      text: "¿Qué parte de vuestras deudas creeis que podéis pagar en los próximos 12 meses?",
+      text: "¿Qué parte de vuestras deudas creéis que podéis pagar en los próximos 12 meses?",
       options: [
-        { label: "a) Ninguna", value: "a", points: 1 },
-        { label: "b) Menos del 25 %", value: "b", points: 2 },
-        { label: "c) Entre el 25 % y el 75 %", value: "c", points: 3 },
-        { label: "d) Más del 75 %", value: "d", points: 4 },
+        { label: "a) Más del 75 %", value: "a", points: 4 },
+        { label: "b) Entre el 25 % y el 75 %", value: "b", points: 3 },
+        { label: "c) Menos del 25 %", value: "c", points: 2 },
+        { label: "d) Ninguna", value: "d", points: 1 },
       ],
     },
   ],
