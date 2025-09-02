@@ -11,6 +11,7 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 interface EmailRequestBody {
@@ -20,12 +21,7 @@ interface EmailRequestBody {
   results: any;
 }
 
-// Validate required environment variables
-if (!RESEND_API_KEY) {
-  console.error("RESEND_API_KEY is not configured");
-}
-
-const resend = new Resend(RESEND_API_KEY);
+// Validate required environment variables on request handling
 
 // HTML sanitization function
 function sanitizeHtml(html: string): string {
@@ -55,6 +51,9 @@ serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
+
+  // Instantiate Resend client only after validating API key to avoid preflight errors
+  const resend = new Resend(RESEND_API_KEY as string);
 
   try {
     console.log("Intentando leer el cuerpo de la solicitud...");
